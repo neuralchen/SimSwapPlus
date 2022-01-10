@@ -112,3 +112,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+/train_logs
+/test_logs
+/GUI
+/benchmark
+/reference

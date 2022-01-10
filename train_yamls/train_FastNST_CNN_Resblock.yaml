@@ -1,0 +1,108 @@
+# Related scripts
+train_script_name: FastNST_CNN
+
+# models' scripts
+model_configs: 
+  g_model:
+    script: FastNST_CNN_Resblock
+    class_name: Generator
+    module_params:
+      g_conv_dim: 32
+      g_kernel_size: 3
+      res_num: 6
+      n_class: 11
+      image_size: 256
+      window_size: 8
+
+# Training information
+total_epoch: 120
+batch_size: 16
+imcrop_size: 256
+max2Keep: 10
+
+# Dataset
+style_img_path: "images/mosaic.jpg"
+dataloader: place365
+dataset_name: styletransfer
+dataset_params:
+  random_seed: 1234
+  dataloader_workers: 8
+  color_jitter: Enable
+  color_config:
+    brightness: 0.05
+    contrast:   0.05
+    saturation: 0.05
+    hue:        0.05
+
+  selected_content_dir: ['a/abbey', 'a/arch', 'a/amphitheater', 'a/aqueduct', 'a/arena/rodeo', 'a/athletic_field/outdoor',
+         'b/badlands', 'b/balcony/exterior', 'b/bamboo_forest', 'b/barn', 'b/barndoor', 'b/baseball_field',
+         'b/basilica', 'b/bayou', 'b/beach', 'b/beach_house', 'b/beer_garden', 'b/boardwalk', 'b/boathouse',
+         'b/botanical_garden', 'b/bullring', 'b/butte', 'c/cabin/outdoor', 'c/campsite', 'c/campus',
+         'c/canal/natural', 'c/canal/urban', 'c/canyon', 'c/castle', 'c/church/outdoor', 'c/chalet',
+         'c/cliff', 'c/coast', 'c/corn_field', 'c/corral', 'c/cottage', 'c/courtyard', 'c/crevasse',
+         'd/dam', 'd/desert/vegetation', 'd/desert_road', 'd/doorway/outdoor', 'f/farm', 'f/fairway',
+         'f/field/cultivated', 'f/field/wild', 'f/field_road', 'f/fishpond', 'f/florist_shop/indoor',
+         'f/forest/broadleaf', 'f/forest_path', 'f/forest_road', 'f/formal_garden', 'g/gazebo/exterior',
+         'g/glacier', 'g/golf_course', 'g/greenhouse/indoor', 'g/greenhouse/outdoor', 'g/grotto', 'g/gorge',
+         'h/hayfield', 'h/herb_garden', 'h/hot_spring', 'h/house', 'h/hunting_lodge/outdoor', 'i/ice_floe',
+         'i/ice_shelf', 'i/iceberg', 'i/inn/outdoor', 'i/islet', 'j/japanese_garden', 'k/kasbah',
+         'k/kennel/outdoor', 'l/lagoon', 'l/lake/natural', 'l/lawn', 'l/library/outdoor', 'l/lighthouse',
+         'm/mansion', 'm/marsh', 'm/mausoleum', 'm/moat/water', 'm/mosque/outdoor', 'm/mountain',
+         'm/mountain_path', 'm/mountain_snowy', 'o/oast_house', 'o/ocean', 'o/orchard', 'p/park',
+         'p/pasture', 'p/pavilion', 'p/picnic_area', 'p/pier', 'p/pond', 'r/raft', 'r/railroad_track',
+         'r/rainforest', 'r/rice_paddy', 'r/river', 'r/rock_arch', 'r/roof_garden', 'r/rope_bridge',
+         'r/ruin', 's/schoolhouse', 's/sky', 's/snowfield', 's/swamp', 's/swimming_hole',
+         's/synagogue/outdoor', 't/temple/asia', 't/topiary_garden', 't/tree_farm', 't/tree_house',
+         'u/underwater/ocean_deep', 'u/utility_room', 'v/valley', 'v/vegetable_garden', 'v/viaduct',
+         'v/village', 'v/vineyard', 'v/volcano', 'w/waterfall', 'w/watering_hole', 'w/wave',
+         'w/wheat_field', 'z/zen_garden', 'a/alcove', 'a/apartment-building/outdoor', 'a/artists_loft',
+         'b/building_facade', 'c/cemetery']
+  # selected_content_dir: ['a_abbey', 'a_arch', 'a_amphitheater', 'a_aqueduct', 'a_arena_rodeo', 'a_athletic_field_outdoor',
+  #        'b_badlands', 'b_balcony_exterior', 'b_bamboo_forest', 'b_barn', 'b_barndoor', 'b_baseball_field',
+  #        'b_basilica', 'b_bayou', 'b_beach', 'b_beach_house', 'b_beer_garden', 'b_boardwalk', 'b_boathouse',
+  #        'b_botanical_garden', 'b_bullring', 'b_butte', 'c_cabin_outdoor', 'c_campsite', 'c_campus',
+  #        'c_canal_natural', 'c_canal_urban', 'c_canyon', 'c_castle', 'c_church_outdoor', 'c_chalet',
+  #        'c_cliff', 'c_coast', 'c_corn_field', 'c_corral', 'c_cottage', 'c_courtyard', 'c_crevasse',
+  #        'd_dam', 'd_desert_vegetation', 'd_desert_road', 'd_doorway_outdoor', 'f_farm', 'f_fairway',
+  #        'f_field_cultivated', 'f_field_wild', 'f_field_road', 'f_fishpond', 'f_florist_shop_indoor',
+  #        'f_forest_broadleaf', 'f_forest_path', 'f_forest_road', 'f_formal_garden', 'g_gazebo_exterior',
+  #        'g_glacier', 'g_golf_course', 'g_greenhouse_indoor', 'g_greenhouse_outdoor', 'g_grotto', 'g_gorge',
+  #        'h_hayfield', 'h_herb_garden', 'h_hot_spring', 'h_house', 'h_hunting_lodge_outdoor', 'i_ice_floe',
+  #        'i_ice_shelf', 'i_iceberg', 'i_inn_outdoor', 'i_islet', 'j_japanese_garden', 'k_kasbah',
+  #        'k_kennel_outdoor', 'l_lagoon', 'l_lake_natural', 'l_lawn', 'l_library_outdoor', 'l_lighthouse',
+  #        'm_mansion', 'm_marsh', 'm_mausoleum', 'm_moat_water', 'm_mosque_outdoor', 'm_mountain',
+  #        'm_mountain_path', 'm_mountain_snowy', 'o_oast_house', 'o_ocean', 'o_orchard', 'p_park',
+  #        'p_pasture', 'p_pavilion', 'p_picnic_area', 'p_pier', 'p_pond', 'r_raft', 'r_railroad_track',
+  #        'r_rainforest', 'r_rice_paddy', 'r_river', 'r_rock_arch', 'r_roof_garden', 'r_rope_bridge',
+  #        'r_ruin', 's_schoolhouse', 's_sky', 's_snowfield', 's_swamp', 's_swimming_hole',
+  #        's_synagogue_outdoor', 't_temple_asia', 't_topiary_garden', 't_tree_farm', 't_tree_house',
+  #        'u_underwater_ocean_deep', 'u_utility_room', 'v_valley', 'v_vegetable_garden', 'v_viaduct',
+  #        'v_village', 'v_vineyard', 'v_volcano', 'w_waterfall', 'w_watering_hole', 'w_wave',
+  #        'w_wheat_field', 'z_zen_garden', 'a_alcove', 'a_apartment-building_outdoor', 'a_artists_loft',
+  #        'b_building_facade', 
+  #       'c_cemetery'
+  #        ]
+
+
+eval_dataloader: DIV2K_hdf5
+eval_dataset_name: DF2K_H5_Eval
+eval_batch_size: 2
+
+# Dataset
+
+# Optimizer
+optim_type: Adam
+g_optim_config:
+  lr: !!float 2e-4
+  betas: [0.9, 0.99]
+
+content_weight: 2.0
+style_weight: 1.0
+layers_weight: [1.0, 1.0, 1.0, 1.0, 1.0]
+
+# Log 
+log_step: 100
+model_save_epoch: 1
+use_tensorboard: True
+checkpoint_names:
+  generator_name: Generator
