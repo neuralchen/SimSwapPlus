@@ -81,7 +81,7 @@ class Generator(nn.Module):
         )
         self.last_layer = nn.Sequential(nn.ReflectionPad2d(3), nn.Conv2d(64, output_nc, kernel_size=7, padding=0))
 
-    def forward(self, input, dlatents):
+    def forward(self, input, id):
         x = input  # 3*224*224
         res = self.first_layer(x)
         res = self.down1(res)
@@ -90,7 +90,7 @@ class Generator(nn.Module):
         res = self.down3(res)
 
         for i in range(len(self.BottleNeck)):
-            res = self.BottleNeck[i](res, dlatents)
+            res = self.BottleNeck[i](res, id)
 
         res = self.up4(res)
         res = self.up3(res)

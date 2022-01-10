@@ -256,7 +256,7 @@ class Trainer(object):
 
                 latent_id       = F.normalize(latent_id, p=2, dim=1)
         
-                losses, img_fake= model(None, src_image1, latent_id, None, for_G=True)
+                losses, img_fake= self.gen(src_image1, latent_id)
 
                 # update Generator weights
                 losses      = [ torch.mean(x) if not isinstance(x, int) else x for x in losses ]
