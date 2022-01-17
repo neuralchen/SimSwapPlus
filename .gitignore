@@ -121,8 +121,8 @@ train_logs/
 *.jpg
 *.JPG
 
-./env
-./wandb
-./train_logs
-./test_logs
-./arcface_ckpt
+env/
+wandb/
+train_logs/
+test_logs/
+arcface_ckpt/
