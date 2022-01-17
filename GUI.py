@@ -5,7 +5,7 @@
 # Created Date: Wednesday December 22nd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 10th January 2022 1:47:55 pm
+# Last Modified:  Monday, 17th January 2022 12:45:32 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -545,16 +545,18 @@ class Application(tk.Frame):
         thread_update.start()
     
     def Machines_Update(self):
-        self.update_log_task()
+        # self.update_log_task()
         thread_update = threading.Thread(target=self.machines_update)
         thread_update.start()
 
     def machines_update(self):
         self.machine_list = read_config(self.machine_json)
+        print(self.machine_list)
         ip_list = []
         for item in self.machine_list:
             self.machine_dict[item["ip"]] = item
             ip_list.append(item["ip"])
+        print(ip_list)
         self.list_com["value"] = ip_list
         self.list_com.current(0)
         ip      = self.list_com.get()

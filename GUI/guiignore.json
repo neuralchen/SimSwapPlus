@@ -1,0 +1,22 @@
+{
+    "white_list": {
+        "extension": [
+            "py",
+            "yaml"
+        ],
+        "file": [],
+        "path": []
+    },
+    "black_list": {
+        "extension": [
+            "png",
+            "yaml"
+        ],
+        "file": [],
+        "path": [
+            "train_logs/",
+            "test_logs/",
+            "GUI/"
+        ]
+    }
+}

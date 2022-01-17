@@ -1,4 +1,5 @@
 import os
+import glob
 import torch
 import random
 from PIL import Image
@@ -12,8 +13,8 @@ class data_prefetcher():
         self.loader = loader
         self.dataiter = iter(loader)
         self.stream = torch.cuda.Stream()
-        # self.mean = torch.tensor([0.485 * 255, 0.456 * 255, 0.406 * 255]).cuda().view(1,3,1,1)
-        # self.std = torch.tensor([0.229 * 255, 0.224 * 255, 0.225 * 255]).cuda().view(1,3,1,1)
+        self.mean = torch.tensor([0.485, 0.456, 0.406]).cuda().view(1,3,1,1)
+        self.std = torch.tensor([0.229, 0.224, 0.225]).cuda().view(1,3,1,1)
         # With Amp, it isn't necessary to manually convert data to half.
         # if args.fp16:
         #     self.mean = self.mean.half()
@@ -23,13 +24,16 @@ class data_prefetcher():
 
     def preload(self):
         try:
-            self.content = next(self.dataiter)
+            self.src_image1, self.src_image2 = next(self.dataiter)
         except StopIteration:
             self.dataiter = iter(self.loader)
-            self.content = next(self.dataiter)
+            self.src_image1, self.src_image2 = next(self.dataiter)
             
         with torch.cuda.stream(self.stream):
-            self.content= self.content.cuda(non_blocking=True)
+            self.src_image1  = self.src_image1.cuda(non_blocking=True)
+            self.src_image1  = self.src_image1.sub_(self.mean).div_(self.std)
+            self.src_image2  = self.src_image2.cuda(non_blocking=True)
+            self.src_image2  = self.src_image2.sub_(self.mean).div_(self.std)
             # With Amp, it isn't necessary to manually convert data to half.
             # if args.fp16:
             #     self.next_input = self.next_input.half()
@@ -38,9 +42,10 @@ class data_prefetcher():
             # self.next_input = self.next_input.sub_(self.mean).div_(self.std)
     def next(self):
         torch.cuda.current_stream().wait_stream(self.stream)
-        content = self.content
+        src_image1  = self.src_image1
+        src_image2  = self.src_image2
         self.preload()
-        return content
+        return src_image1, src_image2
     
     def __len__(self):
         """Return the number of images."""
@@ -50,90 +55,69 @@ class VGGFace2HQDataset(data.Dataset):
     """Dataset class for the Artworks dataset and content dataset."""
 
     def __init__(self,
-                    content_image_dir,
-                    selectedContent,
-                    content_transform,
+                    image_dir,
+                    img_transform,
                     subffix='jpg',
                     random_seed=1234):
-        """Initialize and preprocess the CelebA dataset."""
-        self.content_image_dir  = content_image_dir
-        self.content_transform  = content_transform
-        self.selectedContent    = selectedContent
-        self.subffix            = subffix
-        self.content_dataset    = []
-        self.random_seed        = random_seed
+        """Initialize and preprocess the VGGFace2 HQ dataset."""
+        self.image_dir      = image_dir
+        self.img_transform  = img_transform   
+        self.subffix        = subffix
+        self.dataset        = []
+        self.random_seed    = random_seed
         self.preprocess()
-        self.num_images = len(self.content_dataset)
+        self.num_images = len(self.dataset)
 
     def preprocess(self):
-        """Preprocess the Artworks dataset."""
-        print("processing content images...")
-        for dir_item in self.selectedContent:
-            join_path = Path(self.content_image_dir,dir_item)
-            if join_path.exists():
-                print("processing %s"%dir_item,end='\r')
-                images = join_path.glob('*.%s'%(self.subffix))
-                for item in images:
-                    self.content_dataset.append(item)
-            else:
-                print("%s dir does not exist!"%dir_item,end='\r')
+        """Preprocess the VGGFace2 HQ dataset."""
+        print("processing VGGFace2 HQ dataset images...")
+
+        temp_path   = os.path.join(self.image_dir,'*/')
+        pathes      = glob.glob(temp_path)
+        self.dataset = []
+        for dir_item in pathes:
+            join_path = glob.glob(os.path.join(dir_item,'*.jpg'))
+            print("processing %s"%dir_item,end='\r')
+            temp_list = []
+            for item in join_path:
+                temp_list.append(item)
+            self.dataset.append(temp_list)
         random.seed(self.random_seed)
-        random.shuffle(self.content_dataset)
-        print('Finished preprocessing the Content dataset, total image number: %d...'%len(self.content_dataset))
-
+        random.shuffle(self.dataset)
+        print('Finished preprocessing the VGGFace2 HQ dataset, total dirs number: %d...'%len(self.dataset))
+             
     def __getitem__(self, index):
-        """Return one image and its corresponding attribute label."""
-        filename        = self.content_dataset[index]
-        image           = Image.open(filename)
-        content         = self.content_transform(image)
-        return content
+        """Return two src domain images and two dst domain images."""
+        dir_tmp1        = self.dataset[index]
+        dir_tmp1_len    = len(dir_tmp1)
 
+        filename1   = dir_tmp1[random.randint(0,dir_tmp1_len-1)]
+        filename2   = dir_tmp1[random.randint(0,dir_tmp1_len-1)]
+        image1      = self.img_transform(Image.open(filename1))
+        image2      = self.img_transform(Image.open(filename2))
+        return image1, image2
+    
     def __len__(self):
         """Return the number of images."""
         return self.num_images
 
 def GetLoader(  dataset_roots,
                 batch_size=16,
-                crop_size=512,
                 **kwargs
                 ):
     """Build and return a data loader."""
-    if not kwargs:
-        a = "Input params error!"
-        raise ValueError(print(a))
         
-    colorJitterEnable = kwargs["color_jitter"]
-    colorConfig       = kwargs["color_config"]
-    num_workers       = kwargs["dataloader_workers"]
-    num_workers       = kwargs["dataloader_workers"]
-    place365_root     = dataset_roots["Place365_big"]
-    selected_c_dir    = kwargs["selected_content_dir"]
-    random_seed       = kwargs["random_seed"]
+    data_root       = dataset_roots
+    random_seed     = kwargs["random_seed"]
+    num_workers     = kwargs["dataloader_workers"]
     
     c_transforms = []
     
-    # s_transforms.append(T.Resize(900))
-    c_transforms.append(T.Resize(900))
-    c_transforms.append(T.RandomCrop(crop_size))
-    c_transforms.append(T.RandomHorizontalFlip())
-    c_transforms.append(T.RandomVerticalFlip())
-
-    if colorJitterEnable:
-        if colorConfig is not None:
-            print("Enable color jitter!")
-            colorBrightness = colorConfig["brightness"]
-            colorContrast   = colorConfig["contrast"]
-            colorSaturation = colorConfig["saturation"]
-            colorHue        = (-colorConfig["hue"],colorConfig["hue"])
-            c_transforms.append(T.ColorJitter(brightness=colorBrightness,\
-                                contrast=colorContrast,saturation=colorSaturation, hue=colorHue))
     c_transforms.append(T.ToTensor())
-    c_transforms.append(T.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)))
     c_transforms = T.Compose(c_transforms)
 
-    content_dataset = Place365Dataset(
-                            place365_root, 
-                            selected_c_dir,
+    content_dataset = VGGFace2HQDataset(
+                            data_root, 
                             c_transforms,
                             "jpg",
                             random_seed)

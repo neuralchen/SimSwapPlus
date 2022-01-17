@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 19th October 2021 8:50:15 pm
+# Last Modified:  Monday, 17th January 2022 1:00:00 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,22 +31,28 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='liff_warpinvo_0',
+    parser.add_argument('-v', '--version', type=str, default='FM',
                                             help="version name for train, test, finetune")
+    parser.add_argument('-t', '--tag', type=str, default='test',
+                                            help="tag for current experiment")
 
     parser.add_argument('-p', '--phase', type=str, default="train",
                                             choices=['train', 'finetune','debug'],
                                                 help="The phase of current project")
 
-    parser.add_argument('-c', '--cuda', type=int, default=1) # <0 if it is set as -1, program will use CPU
-    parser.add_argument('-e', '--checkpoint_epoch', type=int, default=74,
+    parser.add_argument('-c', '--cuda', type=int, default=0) # <0 if it is set as -1, program will use CPU
+    parser.add_argument('-e', '--ckpt', type=int, default=74,
                                 help="checkpoint epoch for test phase or finetune phase")
 
     # training
     parser.add_argument('--experiment_description', type=str,
                                 default="尝试使用Liif+Invo作为上采样和降采样的算子，降采样两个DSF算子，上采样两个DSF算子")
 
-    parser.add_argument('--train_yaml', type=str, default="train_FastNST_CNN_Resblock.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_512FM.yaml")
+
+    # system logger
+    parser.add_argument('--logger', type=str,
+                  default="wandb", choices=['tensorboard', 'wandb','none'], help='system logger')
 
     # # logs (does not to be changed in most time)
     # parser.add_argument('--dataloader_workers', type=int, default=6)

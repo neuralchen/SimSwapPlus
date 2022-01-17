@@ -1,0 +1,11 @@
+[
+    {
+        "ip": "101.33.242.26",
+        "user": "ubuntu",
+        "port": 22,
+        "passwd": "zpKlOW0sMlyt!xhE",
+        "path": "/home/ubuntu/CXH/simswap_plus",
+        "ckp_path": "train_logs",
+        "logfilename": "filestate_machine0.json"
+    }
+]
