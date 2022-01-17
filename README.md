@@ -1,16 +1,27 @@
-# Project Name
+# Simswap++
 
 ## Dependencies
 - python
 - yaml (pip install pyyaml)
 - paramiko (For ssh file transportation)
-- pytorch
+- pytorch > 1.8
 - tkinter (For GUI)
 - pillow
 - torchvision
 - opencv
+- matplotlib
+- timm
+
+## logger
+
 - tensorboard (pip install tensorboard)
 - tensorboardX (pip install tensorboardX)
+
+***OR***
+
+- wandb (pip install wandb)
+
+***Logger is an option setting, which can be adjust with train.py --logger [wandb, tensorbaord, None]***
 
 ## Usage
 - To configure the project in the ```main.py```.

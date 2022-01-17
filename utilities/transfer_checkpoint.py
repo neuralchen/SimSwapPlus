@@ -5,7 +5,7 @@
 # Created Date: Wednesday February 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 4th February 2021 1:27:09 pm
+# Last Modified:  Monday, 17th January 2022 1:25:56 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -14,8 +14,7 @@ from torch import nn as nn
 from torch.nn import functional as F
 from torch.nn import init as init
 import os
-import numpy as np
-import scipy.io as io
+
 
 class RepSRPlain_pixel(nn.Module):
     """Networks consisting of Residual in Residual Dense Block, which is used
