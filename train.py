@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 17th January 2022 1:00:00 pm
+# Last Modified:  Monday, 17th January 2022 4:42:53 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,24 +31,24 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='FM',
+    parser.add_argument('-v', '--version', type=str, default='2layerFM',
                                             help="version name for train, test, finetune")
-    parser.add_argument('-t', '--tag', type=str, default='test',
+    parser.add_argument('-t', '--tag', type=str, default='Feature_match',
                                             help="tag for current experiment")
 
     parser.add_argument('-p', '--phase', type=str, default="train",
                                             choices=['train', 'finetune','debug'],
                                                 help="The phase of current project")
 
-    parser.add_argument('-c', '--cuda', type=int, default=0) # <0 if it is set as -1, program will use CPU
+    parser.add_argument('-c', '--cuda', type=int, default=1) # <0 if it is set as -1, program will use CPU
     parser.add_argument('-e', '--ckpt', type=int, default=74,
                                 help="checkpoint epoch for test phase or finetune phase")
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="尝试使用Liif+Invo作为上采样和降采样的算子，降采样两个DSF算子，上采样两个DSF算子")
+                                default="减小重建和feature match的权重，使用2和3的feature作为feature")
 
-    parser.add_argument('--train_yaml', type=str, default="train_512FM.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_2layer_FM.yaml")
 
     # system logger
     parser.add_argument('--logger', type=str,

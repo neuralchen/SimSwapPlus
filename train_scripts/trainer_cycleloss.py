@@ -5,7 +5,7 @@
 # Created Date: Sunday January 9th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 17th January 2022 5:31:43 pm
+# Last Modified:  Wednesday, 19th January 2022 4:21:03 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -170,7 +170,7 @@ class Trainer(TrainerBase):
                 img_fake    = img_fake.numpy()
                 for j in range(batch_size):
                     imgs.append(img_fake[j,...])
-            print("Save test data")
+            print("Save sample image at step = % ..............."%step)
             imgs = np.stack(imgs, axis = 0).transpose(0,2,3,1)
             plot_batch(imgs, os.path.join(self.sample_dir, 'step_'+str(step+1)+'.jpg'))
 
@@ -180,7 +180,7 @@ class Trainer(TrainerBase):
     def train(self):
 
         ckpt_dir    = self.config["project_checkpoints"]
-        log_freq    = self.config["log_step"]
+        log_frep    = self.config["log_step"]
         model_freq  = self.config["model_save_step"]
         sample_freq = self.config["sample_step"]
         total_step  = self.config["total_step"]
@@ -195,6 +195,7 @@ class Trainer(TrainerBase):
         id_w        = self.config["id_weight"]
         rec_w       = self.config["reconstruct_weight"]
         feat_w      = self.config["feature_match_weight"]
+        cyc_w       = self.config["cycle_weight"]
         
         
         
@@ -256,9 +257,14 @@ class Trainer(TrainerBase):
                     latent_fake     = F.normalize(latent_fake, p=2, dim=1)
                     loss_G_ID       = (1 - cos_loss(latent_fake, latent_id)).mean()
                     real_feat       = self.dis.get_feature(src_image1)
-                    feat_match_loss = l1_loss(feat["3"],real_feat["3"])
+                    feat_match_loss = l1_loss(feat["3"],real_feat["3"]) + l1_loss(feat["2"],real_feat["2"])
+                    
+                    src1_down       = F.interpolate(src_image1, size=(112,112), mode='bicubic')
+                    src1_id         = self.arcface(src1_down)
+                    cyc_fake        = self.gen(img_fake, src1_id)
+                    loss_cyc        = l1_loss(cyc_fake, src_image1)
                     loss_G          = loss_Gmain + loss_G_ID * id_w + \
-                                                feat_match_loss * feat_w
+                                        feat_match_loss * feat_w + cyc_w * loss_cyc
                     if step%2 == 0:
                         #G_Rec
                         loss_G_Rec  = l1_loss(img_fake, src_image1)
@@ -269,42 +275,44 @@ class Trainer(TrainerBase):
                     self.g_optimizer.step()
                 
             # Print out log info
-            if (step + 1) % log_freq == 0:
+            if (step + 1) % log_frep == 0:
                 elapsed = time.time() - start_time
                 elapsed = str(datetime.timedelta(seconds=elapsed))
                 
                 epochinformation="[{}], Elapsed [{}], Step [{}/{}], \
-                        G_loss: {:.4f}, Rec_loss: {:.4f}, Fm_loss: {:.4f}, \
-                            D_loss: {:.4f}, D_fake: {:.4f}, D_real: {:.4f}". \
-                            format(self.config["version"], elapsed, step, total_step, \
-                                loss_G.item(), loss_G_Rec.item(), feat_match_loss.item(), \
-                                    loss_D.item(), loss_Dgen.item(), loss_Dreal.item())
+                        G_ID: {:.4f}, G_loss: {:.4f}, Rec_loss: {:.4f}, Fm_loss: {:.4f}, \
+                        D_loss: {:.4f}, D_fake: {:.4f}, D_real: {:.4f}". \
+                        format(self.config["version"], elapsed, step, total_step, \
+                        loss_G_ID.item(), loss_G.item(), loss_G_Rec.item(), feat_match_loss.item(), \
+                        loss_D.item(), loss_Dgen.item(), loss_Dreal.item())
                 print(epochinformation)
                 self.reporter.writeInfo(epochinformation)
 
                 if self.config["logger"] == "tensorboard":
                     self.logger.add_scalar('G/G_loss', loss_G.item(), step)
-                    self.logger.add_scalar('G/Rec_loss', loss_G_Rec.item(), step)
-                    self.logger.add_scalar('G/Fm_loss', feat_match_loss.item(), step)
+                    self.logger.add_scalar('G/G_Rec', loss_G_Rec.item(), step)
+                    self.logger.add_scalar('G/G_feat_match', feat_match_loss.item(), step)
+                    self.logger.add_scalar('G/G_ID', loss_G_ID.item(), step)
+                    self.logger.add_scalar('G/Cycle', loss_cyc.item(), step)
                     self.logger.add_scalar('D/D_loss', loss_D.item(), step)
                     self.logger.add_scalar('D/D_fake', loss_Dgen.item(), step)
                     self.logger.add_scalar('D/D_real', loss_Dreal.item(), step)
                 elif self.config["logger"] == "wandb":
                     self.logger.log({"G_loss": loss_G.item()}, step = step)
-                    self.logger.log({"Rec_loss": loss_G_Rec.item()}, step = step)
-                    self.logger.log({"Fm_loss": feat_match_loss.item()}, step = step)
+                    self.logger.log({"G_Rec": loss_G_Rec.item()}, step = step)
+                    self.logger.log({"G_feat_match": feat_match_loss.item()}, step = step)
+                    self.logger.log({"G_ID": loss_G_ID.item()}, step = step)
+                    self.logger.log({"Cycle": loss_cyc.item()}, step = step)
                     self.logger.log({"D_loss": loss_D.item()}, step = step)
                     self.logger.log({"D_fake": loss_Dgen.item()}, step = step)
                     self.logger.log({"D_real": loss_Dreal.item()}, step = step)
-            
             if (step + 1) % sample_freq == 0:
                 self.__evaluation__(
                     step = step,
                     **{
                     "src1": src_image1,
                     "src2": src_image2
-                })
-                    
+                })        
                         
                 
             #===============adjust learning rate============#
