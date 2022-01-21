@@ -127,3 +127,5 @@ train_logs/
 test_logs/
 arcface_ckpt/
 GUI/
+insightface_func/
+parsing_model/

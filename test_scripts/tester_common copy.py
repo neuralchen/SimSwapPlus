@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 12th October 2021 8:22:37 pm
+# Last Modified:  Sunday, 4th July 2021 11:32:14 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -35,13 +35,13 @@ class Tester(object):
         package         = __import__("data_tools.test_dataloader_%s"%dlModulename, fromlist=True)
         dataloaderClass = getattr(package, 'TestDataset')
         dataloader      = dataloaderClass(config["test_data_path"],
-                                        1,
+                                        config["batch_size"],
                                         ["png","jpg"])
         self.test_loader= dataloader
 
-        self.test_iter  = len(dataloader)
-        # if len(dataloader)%config["batch_size"]>0:
-        #     self.test_iter+=1
+        self.test_iter  = len(dataloader)//config["batch_size"]
+        if len(dataloader)%config["batch_size"]>0:
+            self.test_iter+=1
         
     
     def __init_framework__(self):
@@ -52,14 +52,19 @@ class Tester(object):
         #===============build models================#
         print("build models...")
         # TODO [import models here]
-        model_config    = self.config["model_configs"]
-        script_name     = self.config["com_base"] + model_config["g_model"]["script"]
-        class_name      = model_config["g_model"]["class_name"]
+        script_name     = "components."+self.config["module_script_name"]
+        class_name      = self.config["class_name"]
         package         = __import__(script_name, fromlist=True)
         network_class   = getattr(package, class_name)
+        n_class         = len(self.config["selectedStyleDir"])
 
         # TODO replace below lines to define the model framework        
-        self.network = network_class(**model_config["g_model"]["module_params"])
+        self.network = network_class(self.config["GConvDim"],
+                                    self.config["GKS"],
+                                    self.config["resNum"],
+                                    n_class
+                                    #**self.config["module_params"]
+                                )
         
         # print and recorde model structure
         self.reporter.writeInfo("Model structure:")
@@ -68,14 +73,12 @@ class Tester(object):
         # train in GPU
         if self.config["cuda"] >=0:
             self.network = self.network.cuda()
-        
-        model_path = os.path.join(self.config["project_checkpoints"],
-                                        "epoch%d_%s.pth"%(self.config["checkpoint_epoch"],
-                                        self.config["checkpoint_names"]["generator_name"]))
-    
-        self.network.load_state_dict(torch.load(model_path))
+        # loader1 = torch.load(self.config["ckp_name"]["generator_name"])
+        # print(loader1.key())
+        # pathwocao = "H:\\Multi Scale Kernel Prediction Networks\\Mobile_Oriented_KPN\\train_logs\\repsr_pixel_0\\checkpoints\\epoch%d_RepSR_Plain.pth"%self.config["checkpoint_epoch"]
+        self.network.load_state_dict(torch.load(self.config["ckp_name"]["generator_name"])["g_model"])
         # self.network.load_state_dict(torch.load(pathwocao))
-        print('loaded trained backbone model epoch {}...!'.format(self.config["project_checkpoints"]))
+        print('loaded trained backbone model epoch {}...!'.format(self.config["checkpoint_epoch"]))
 
     def test(self):
         
@@ -84,13 +87,18 @@ class Tester(object):
         ckp_epoch   = self.config["checkpoint_epoch"]
         version     = self.config["version"]
         batch_size  = self.config["batch_size"]
-        win_size    = self.config["model_configs"]["g_model"]["module_params"]["window_size"]
+        style_names = self.config["selectedStyleDir"]
+        n_class     = len(style_names)
                             
         # models
         self.__init_framework__()
 
+        condition_labels = torch.ones((n_class, batch_size, 1)).long()
+        for i in range(n_class):
+            condition_labels[i,:,:] = condition_labels[i,:,:]*i
+        if self.config["cuda"] >=0:
+            condition_labels = condition_labels.cuda()
         total = len(self.test_loader)
-        print("total:", total)
         # Start time
         import datetime
         print("Start to test at %s"%(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
@@ -98,25 +106,18 @@ class Tester(object):
         start_time = time.time()
         self.network.eval()
         with torch.no_grad():
-            for _ in tqdm(range(total)):
+            for _ in tqdm(range(total//batch_size)):
                 contents, img_names = self.test_loader()
-                B, C, H, W  = contents.shape
-                crop_h      = H - H%32
-                crop_w      = W - W%32
-                crop_s      = min(crop_h, crop_w)
-                contents    = contents[:,:,(H//2 - crop_s//2):(crop_s//2 + H//2),
-                                        (W//2 - crop_s//2):(crop_s//2 + W//2)]
-                if self.config["cuda"] >=0:
-                    contents = contents.cuda()
-                res    = self.network(contents, (crop_s, crop_s))
-                print("res shape:", res.shape)
-                res    = tensor2img(res.cpu())
-                temp_img = res[0,:,:,:]
-                temp_img = cv2.cvtColor(temp_img, cv2.COLOR_RGB2BGR)
-                print(save_dir)
-                print(img_names[0])
-                cv2.imwrite(os.path.join(save_dir,'{}_version_{}_step{}.png'.format(
-                                    img_names[0], version, ckp_epoch)),temp_img)
+                for i in range(n_class):
+                    if self.config["cuda"] >=0:
+                        contents = contents.cuda()
+                    res, _ = self.network(contents, condition_labels[i, 0, :])
+                    res    = tensor2img(res.cpu())
+                    for t in range(batch_size):
+                        temp_img = res[t,:,:,:]
+                        temp_img = cv2.cvtColor(temp_img, cv2.COLOR_RGB2BGR)
+                        cv2.imwrite(os.path.join(save_dir,'{}_version_{}_step{}_style_{}.png'.format(
+                                            img_names[t], version, ckp_epoch, style_names[i])),temp_img)
                                             
         elapsed = time.time() - start_time
         elapsed = str(datetime.timedelta(seconds=elapsed))
