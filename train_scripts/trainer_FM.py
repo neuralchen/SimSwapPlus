@@ -5,7 +5,7 @@
 # Created Date: Sunday January 9th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 17th January 2022 5:31:43 pm
+# Last Modified:  Saturday, 22nd January 2022 12:45:09 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -24,7 +24,9 @@ from    train_scripts.trainer_base import TrainerBase
 
 class Trainer(TrainerBase):
 
-    def __init__(self, config, reporter):
+    def __init__(self, 
+                config, 
+                reporter):
         super(Trainer, self).__init__(config, reporter)
         
         self.img_std    = torch.Tensor([0.229, 0.224, 0.225]).view(3,1,1)

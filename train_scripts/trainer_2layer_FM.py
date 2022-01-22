@@ -5,7 +5,7 @@
 # Created Date: Sunday January 9th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 17th January 2022 9:27:48 pm
+# Last Modified:  Saturday, 22nd January 2022 12:42:28 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -140,7 +140,8 @@ class Trainer(TrainerBase):
 
     # TODO modify this function to evaluate your model
     # Evaluate the checkpoint
-    def __evaluation__(self,
+    def __evaluation__(
+            self,
             step = 0,
             **kwargs
             ):
