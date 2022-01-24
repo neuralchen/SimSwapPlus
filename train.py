@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 17th January 2022 4:42:53 pm
+# Last Modified:  Monday, 24th January 2022 3:32:47 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,9 +31,9 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='2layerFM',
+    parser.add_argument('-v', '--version', type=str, default='GramFM',
                                             help="version name for train, test, finetune")
-    parser.add_argument('-t', '--tag', type=str, default='Feature_match',
+    parser.add_argument('-t', '--tag', type=str, default='Gram_Feature_match',
                                             help="tag for current experiment")
 
     parser.add_argument('-p', '--phase', type=str, default="train",
@@ -46,9 +46,9 @@ def getParameters():
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="减小重建和feature match的权重，使用2和3的feature作为feature")
+                                default="使用3作为feature, 尝试使用gram矩阵来计算feature matching")
 
-    parser.add_argument('--train_yaml', type=str, default="train_2layer_FM.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_GramFM.yaml")
 
     # system logger
     parser.add_argument('--logger', type=str,

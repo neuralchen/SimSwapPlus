@@ -5,7 +5,7 @@
 # Created Date: Sunday January 9th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 24th January 2022 6:56:17 pm
+# Last Modified:  Monday, 24th January 2022 6:23:16 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -22,13 +22,14 @@ from    utilities.plot import plot_batch
 
 from    train_scripts.trainer_base import TrainerBase
 
+from    utilities.utilities import Gram
+
 class Trainer(TrainerBase):
 
     def __init__(self, 
                 config, 
                 reporter):
         super(Trainer, self).__init__(config, reporter)
-
         import inspect
         print("Current training script -----------> %s"%inspect.getfile(inspect.currentframe()))
         
@@ -207,7 +208,7 @@ class Trainer(TrainerBase):
         
         #===============build losses===================#
         # TODO replace below lines to build your losses
-        # MSE_loss    = torch.nn.MSELoss()
+        MSE_loss    = torch.nn.MSELoss()
         l1_loss     = torch.nn.L1Loss()
         cos_loss    = torch.nn.CosineSimilarity()
 
@@ -261,7 +262,8 @@ class Trainer(TrainerBase):
                     latent_fake     = F.normalize(latent_fake, p=2, dim=1)
                     loss_G_ID       = (1 - cos_loss(latent_fake, latent_id)).mean()
                     real_feat       = self.dis.get_feature(src_image1)
-                    feat_match_loss = l1_loss(feat["3"],real_feat["3"])
+                    feat_match_loss = l1_loss(Gram(feat["3"]), Gram(real_feat["3"])) + \
+                                        l1_loss(Gram(feat["2"]), Gram(real_feat["2"]))
                     loss_G          = loss_Gmain + loss_G_ID * id_w + \
                                                 feat_match_loss * feat_w
                     if step%2 == 0:

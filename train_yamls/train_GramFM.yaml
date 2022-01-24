@@ -1,5 +1,5 @@
 # Related scripts
-train_script_name: FM
+train_script_name: GramFM
 
 # models' scripts
 model_configs:
@@ -51,13 +51,13 @@ d_optim_config:
 
 id_weight: 20.0
 reconstruct_weight: 10.0
-feature_match_weight: 10.0
+feature_match_weight: 100.0
 
 # Log 
 log_step: 300
 model_save_step: 10000
-sample_step: 1000
 total_step: 1000000
+sample_step: 1000
 checkpoint_names:
   generator_name: Generator
   discriminator_name: Discriminator

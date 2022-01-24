@@ -4,7 +4,7 @@ train_script_name: FM
 # models' scripts
 model_configs:
   g_model:
-    script: Generator
+    script: Generator_reduce
     class_name: Generator
     module_params:
       g_conv_dim: 512
