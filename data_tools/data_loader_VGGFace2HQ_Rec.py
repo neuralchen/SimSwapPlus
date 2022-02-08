@@ -1,3 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+#############################################################
+# File: data_loader_VGGFace2HQ copy.py
+# Created Date: Saturday January 29th 2022
+# Author: Chen Xuanhong
+# Email: chenxuanhongzju@outlook.com
+# Last Modified:  Saturday, 29th January 2022 3:39:14 am
+# Modified By: Chen Xuanhong
+# Copyright (c) 2022 Shanghai Jiao Tong University
+#############################################################
+
+
 import os
 import glob
 import torch
@@ -8,15 +21,13 @@ from torch.utils import data
 from torchvision import transforms as T
 # from StyleResize import StyleResize
 
-
 class data_prefetcher():
-    def __init__(self, loader, cur_gpu):
+    def __init__(self, loader):
         self.loader = loader
         self.dataiter = iter(loader)
-        self.stream = torch.cuda.Stream(device=cur_gpu)
-        self.mean = torch.tensor([0.485, 0.456, 0.406]).cuda(device=cur_gpu).view(1,3,1,1)
-        self.std = torch.tensor([0.229, 0.224, 0.225]).cuda(device=cur_gpu).view(1,3,1,1)
-        self.cur_gpu = cur_gpu
+        self.stream = torch.cuda.Stream()
+        self.mean = torch.tensor([0.485, 0.456, 0.406]).cuda().view(1,3,1,1)
+        self.std = torch.tensor([0.229, 0.224, 0.225]).cuda().view(1,3,1,1)
         # With Amp, it isn't necessary to manually convert data to half.
         # if args.fp16:
         #     self.mean = self.mean.half()
@@ -26,16 +37,14 @@ class data_prefetcher():
 
     def preload(self):
         try:
-            self.src_image1, self.src_image2 = next(self.dataiter)
+            self.src_image1 = next(self.dataiter)
         except StopIteration:
             self.dataiter = iter(self.loader)
-            self.src_image1, self.src_image2 = next(self.dataiter)
+            self.src_image1 = next(self.dataiter)
             
         with torch.cuda.stream(self.stream):
-            self.src_image1  = self.src_image1.cuda(device= self.cur_gpu, non_blocking=True)
+            self.src_image1  = self.src_image1.cuda(non_blocking=True)
             self.src_image1  = self.src_image1.sub_(self.mean).div_(self.std)
-            self.src_image2  = self.src_image2.cuda(device= self.cur_gpu, non_blocking=True)
-            self.src_image2  = self.src_image2.sub_(self.mean).div_(self.std)
             # With Amp, it isn't necessary to manually convert data to half.
             # if args.fp16:
             #     self.next_input = self.next_input.half()
@@ -43,11 +52,10 @@ class data_prefetcher():
             # self.next_input = self.next_input.float()
             # self.next_input = self.next_input.sub_(self.mean).div_(self.std)
     def next(self):
-        torch.cuda.current_stream(device= self.cur_gpu,).wait_stream(self.stream)
+        torch.cuda.current_stream().wait_stream(self.stream)
         src_image1  = self.src_image1
-        src_image2  = self.src_image2
         self.preload()
-        return src_image1, src_image2
+        return src_image1
     
     def __len__(self):
         """Return the number of images."""
@@ -74,16 +82,12 @@ class VGGFace2HQDataset(data.Dataset):
         """Preprocess the VGGFace2 HQ dataset."""
         print("processing VGGFace2 HQ dataset images...")
 
-        temp_path   = os.path.join(self.image_dir,'*/')
+        temp_path   = os.path.join(self.image_dir,'*/*')
         pathes      = glob.glob(temp_path)
         self.dataset = []
         for dir_item in pathes:
-            join_path = glob.glob(os.path.join(dir_item,'*.jpg'))
             print("processing %s"%dir_item,end='\r')
-            temp_list = []
-            for item in join_path:
-                temp_list.append(item)
-            self.dataset.append(temp_list)
+            self.dataset.append(dir_item)
         random.seed(self.random_seed)
         random.shuffle(self.dataset)
         print('Finished preprocessing the VGGFace2 HQ dataset, total dirs number: %d...'%len(self.dataset))
@@ -91,20 +95,15 @@ class VGGFace2HQDataset(data.Dataset):
     def __getitem__(self, index):
         """Return two src domain images and two dst domain images."""
         dir_tmp1        = self.dataset[index]
-        dir_tmp1_len    = len(dir_tmp1)
 
-        filename1   = dir_tmp1[random.randint(0,dir_tmp1_len-1)]
-        filename2   = dir_tmp1[random.randint(0,dir_tmp1_len-1)]
-        image1      = self.img_transform(Image.open(filename1))
-        image2      = self.img_transform(Image.open(filename2))
-        return image1, image2
+        image1      = self.img_transform(Image.open(dir_tmp1))
+        return image1
     
     def __len__(self):
         """Return the number of images."""
         return self.num_images
 
 def GetLoader(  dataset_roots,
-                cur_gpu,
                 batch_size=16,
                 **kwargs
                 ):
@@ -115,7 +114,7 @@ def GetLoader(  dataset_roots,
     num_workers     = kwargs["dataloader_workers"]
     
     c_transforms = []
-    
+    c_transforms.append(T.Resize((112,112)))
     c_transforms.append(T.ToTensor())
     c_transforms = T.Compose(c_transforms)
 
@@ -126,7 +125,7 @@ def GetLoader(  dataset_roots,
                             random_seed)
     content_data_loader = data.DataLoader(dataset=content_dataset,batch_size=batch_size,
                     drop_last=True,shuffle=True,num_workers=num_workers,pin_memory=True)
-    prefetcher = data_prefetcher(content_data_loader,cur_gpu)
+    prefetcher = data_prefetcher(content_data_loader)
     return prefetcher
 
 def denorm(x):

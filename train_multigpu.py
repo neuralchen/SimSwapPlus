@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Saturday, 29th January 2022 3:25:24 am
+# Last Modified:  Tuesday, 8th February 2022 1:05:05 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,24 +31,24 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='arcface_rec',
+    parser.add_argument('-v', '--version', type=str, default='multigpu2',
                                             help="version name for train, test, finetune")
-    parser.add_argument('-t', '--tag', type=str, default='arcface_rec',
+    parser.add_argument('-t', '--tag', type=str, default='multigpu',
                                             help="tag for current experiment")
 
     parser.add_argument('-p', '--phase', type=str, default="train",
                                             choices=['train', 'finetune','debug'],
                                                 help="The phase of current project")
 
-    parser.add_argument('-c', '--cuda', type=int, default=0) # <0 if it is set as -1, program will use CPU
+    parser.add_argument('-c', '--gpus', type=int, nargs='+', default=[0,1]) # <0 if it is set as -1, program will use CPU
     parser.add_argument('-e', '--ckpt', type=int, default=74,
                                 help="checkpoint epoch for test phase or finetune phase")
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="用arcface作编码器，进行图像重构")
+                                default="测试多GPU训练")
 
-    parser.add_argument('--train_yaml', type=str, default="train_arcface_rec.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_multigpu.yaml")
 
     # system logger
     parser.add_argument('--logger', type=str,
@@ -148,8 +148,8 @@ def main():
     sys_state = {}
 
     # set the GPU number
-    if config.cuda >= 0:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(config.cuda)
+    gpus = [str(i) for i in config.gpus]
+    os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(gpus) 
 
     # read system environment paths
     env_config = readConfig('env/env.json')
@@ -230,6 +230,7 @@ def main():
     print("Dataloader Name: %s"%sys_state["dataloader"])
     # print("Image Size: %d"%sys_state["imsize"])
     print("Batch size: %d"%(sys_state["batch_size"]))
+    print("GPUs:", gpus)
 
 
     

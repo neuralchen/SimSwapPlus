@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 21st January 2022 10:55:59 am
+# Last Modified:  Sunday, 30th January 2022 4:05:17 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -30,22 +30,22 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='2layerFM',
+    parser.add_argument('-v', '--version', type=str, default='GramFM',
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=310000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=480000,
                                             help="checkpoint epoch for test phase or finetune phase")
 
     # test
-    parser.add_argument('-t', '--test_script_name', type=str, default='video')
+    parser.add_argument('-t', '--test_script_name', type=str, default='image')
     parser.add_argument('-b', '--batch_size', type=int, default=1)
     parser.add_argument('-n', '--node_name', type=str, default='localhost', 
                                             choices=['localhost', '4card','8card','new4card'])
 
 
-    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\dlrb2.jpeg')
-    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\G2010.mp4',
+    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\dlrb2.jpeg')
+    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\ID',
                                                 help="file path for attribute images or video")
     
     parser.add_argument('--use_specified_data', action='store_true')

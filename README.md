@@ -1,7 +1,7 @@
 # Simswap++
 
 ## Dependencies
-- python
+- python > 3.6
 - yaml (pip install pyyaml)
 - paramiko (For ssh file transportation)
 - pytorch > 1.8

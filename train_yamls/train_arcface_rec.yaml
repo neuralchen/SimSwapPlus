@@ -1,0 +1,42 @@
+# Related scripts
+train_script_name: arcface_rec
+
+# models' scripts
+model_configs:
+  g_model:
+    script: arcface_decoder
+    class_name: Decoder
+    module_params:
+      diffaug: False
+      interp224: False
+      backbone_kwargs: {}
+
+
+arcface_ckpt: arcface_ckpt/arcface_checkpoint.tar
+
+# Training information
+batch_size: 64
+
+# Dataset
+dataloader: VGGFace2HQ_Rec
+dataset_name: vggface2_hq
+dataset_params:
+  random_seed: 1234
+  dataloader_workers: 8
+
+# Dataset
+
+# Optimizer
+optim_type: Adam
+g_optim_config:
+  lr:  0.0008
+  betas: [ 0, 0.99]
+  eps: !!float 1e-8
+
+# Log 
+log_step: 200
+model_save_step: 2000
+total_step: 100000
+sample_step: 500
+checkpoint_names:
+  generator_name: Decoder

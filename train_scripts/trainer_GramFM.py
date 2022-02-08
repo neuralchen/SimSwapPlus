@@ -5,7 +5,7 @@
 # Created Date: Sunday January 9th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 24th January 2022 6:23:16 pm
+# Last Modified:  Tuesday, 25th January 2022 3:25:56 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -13,16 +13,15 @@
 import  os
 import  time
 import  random
-
 import  numpy as np
 
 import  torch
 import  torch.nn.functional as F
+
 from    utilities.plot import plot_batch
+from    utilities.utilities import Gram
 
 from    train_scripts.trainer_base import TrainerBase
-
-from    utilities.utilities import Gram
 
 class Trainer(TrainerBase):
 
