@@ -5,7 +5,7 @@
 # Created Date: Sunday February 6th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 8th February 2022 1:50:00 pm
+# Last Modified:  Tuesday, 8th February 2022 10:26:54 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -182,65 +182,3 @@ def GetLoader(  dataset_roots,
 def denorm(x):
     out = (x + 1) / 2
     return out.clamp_(0, 1)
-
-if __name__ == "__main__":
-    from torchvision.utils import save_image
-    style_class  = ["vangogh","picasso","samuel"]
-    categories_names = \
-        ['a/abbey', 'a/arch', 'a/amphitheater', 'a/aqueduct', 'a/arena/rodeo', 'a/athletic_field/outdoor',
-         'b/badlands', 'b/balcony/exterior', 'b/bamboo_forest', 'b/barn', 'b/barndoor', 'b/baseball_field',
-         'b/basilica', 'b/bayou', 'b/beach', 'b/beach_house', 'b/beer_garden', 'b/boardwalk', 'b/boathouse',
-         'b/botanical_garden', 'b/bullring', 'b/butte', 'c/cabin/outdoor', 'c/campsite', 'c/campus',
-         'c/canal/natural', 'c/canal/urban', 'c/canyon', 'c/castle', 'c/church/outdoor', 'c/chalet',
-         'c/cliff', 'c/coast', 'c/corn_field', 'c/corral', 'c/cottage', 'c/courtyard', 'c/crevasse',
-         'd/dam', 'd/desert/vegetation', 'd/desert_road', 'd/doorway/outdoor', 'f/farm', 'f/fairway',
-         'f/field/cultivated', 'f/field/wild', 'f/field_road', 'f/fishpond', 'f/florist_shop/indoor',
-         'f/forest/broadleaf', 'f/forest_path', 'f/forest_road', 'f/formal_garden', 'g/gazebo/exterior',
-         'g/glacier', 'g/golf_course', 'g/greenhouse/indoor', 'g/greenhouse/outdoor', 'g/grotto', 'g/gorge',
-         'h/hayfield', 'h/herb_garden', 'h/hot_spring', 'h/house', 'h/hunting_lodge/outdoor', 'i/ice_floe',
-         'i/ice_shelf', 'i/iceberg', 'i/inn/outdoor', 'i/islet', 'j/japanese_garden', 'k/kasbah',
-         'k/kennel/outdoor', 'l/lagoon', 'l/lake/natural', 'l/lawn', 'l/library/outdoor', 'l/lighthouse',
-         'm/mansion', 'm/marsh', 'm/mausoleum', 'm/moat/water', 'm/mosque/outdoor', 'm/mountain',
-         'm/mountain_path', 'm/mountain_snowy', 'o/oast_house', 'o/ocean', 'o/orchard', 'p/park',
-         'p/pasture', 'p/pavilion', 'p/picnic_area', 'p/pier', 'p/pond', 'r/raft', 'r/railroad_track',
-         'r/rainforest', 'r/rice_paddy', 'r/river', 'r/rock_arch', 'r/roof_garden', 'r/rope_bridge',
-         'r/ruin', 's/schoolhouse', 's/sky', 's/snowfield', 's/swamp', 's/swimming_hole',
-         's/synagogue/outdoor', 't/temple/asia', 't/topiary_garden', 't/tree_farm', 't/tree_house',
-         'u/underwater/ocean_deep', 'u/utility_room', 'v/valley', 'v/vegetable_garden', 'v/viaduct',
-         'v/village', 'v/vineyard', 'v/volcano', 'w/waterfall', 'w/watering_hole', 'w/wave',
-         'w/wheat_field', 'z/zen_garden', 'a/alcove', 'a/apartment-building/outdoor', 'a/artists_loft',
-         'b/building_facade', 'c/cemetery']
-
-    s_datapath      = "D:\\F_Disk\\data_set\\Art_Data\\data_art_backup"
-    c_datapath      = "D:\\Downloads\\data_large"
-    savepath        = "D:\\PatchFace\\PleaseWork\\multi-style-gan\\StyleTransfer\\dataloader_test"
-    
-    imsize          = 512
-    s_datasetloader= getLoader(s_datapath,c_datapath, 
-                style_class, categories_names,
-                crop_size=imsize, batch_size=16, num_workers=4)
-    wocao           = iter(s_datasetloader)
-    for i in range(500):
-        print("new batch")
-        s_image,c_image,label     = next(wocao)
-        print(label)
-        # print(label)
-        # saved_image1 = torch.cat([denorm(image.data),denorm(hahh.data)],3)
-        # save_image(denorm(image), "%s\\%d-label-%d.jpg"%(savepath,i), nrow=1, padding=1)
-    pass
-    # import cv2
-    # import os
-    # for dir_item in categories_names:
-    #     join_path = Path(contentdatapath,dir_item)
-    #     if join_path.exists():
-    #         print("processing %s"%dir_item,end='\r')
-    #         images = join_path.glob('*.%s'%("jpg"))
-    #         for item in images:
-    #             temp_path = str(item)
-    #             # temp = cv2.imread(temp_path)
-    #             temp = Image.open(temp_path)
-    #             if temp.layers<3:
-    #                 print("remove broken image...")
-    #                 print("image name:%s"%temp_path)
-    #                 del temp
-    #                 os.remove(item)

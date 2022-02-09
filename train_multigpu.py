@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 8th February 2022 1:05:05 pm
+# Last Modified:  Tuesday, 8th February 2022 10:50:37 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,7 +31,7 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='multigpu2',
+    parser.add_argument('-v', '--version', type=str, default='multigpu3',
                                             help="version name for train, test, finetune")
     parser.add_argument('-t', '--tag', type=str, default='multigpu',
                                             help="tag for current experiment")
@@ -225,13 +225,15 @@ def main():
     
     # print some important information
     # TODO
-    print("Start to run training script: {}".format(moduleName))
-    print("Traning version: %s"%sys_state["version"])
-    print("Dataloader Name: %s"%sys_state["dataloader"])
-    # print("Image Size: %d"%sys_state["imsize"])
-    print("Batch size: %d"%(sys_state["batch_size"]))
-    print("GPUs:", gpus)
-
+    # print("Start to run training script: {}".format(moduleName))
+    # print("Traning version: %s"%sys_state["version"])
+    # print("Dataloader Name: %s"%sys_state["dataloader"])
+    # # print("Image Size: %d"%sys_state["imsize"])
+    # print("Batch size: %d"%(sys_state["batch_size"]))
+    # print("GPUs:", gpus)
+    print("\n========================================================================\n")
+    print(sys_state)
+    print("\n========================================================================\n")
 
     
     # Load the training script and start to train
