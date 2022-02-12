@@ -7,5 +7,14 @@
         "path": "/home/ubuntu/CXH/simswap_plus",
         "ckp_path": "train_logs",
         "logfilename": "filestate_machine0.json"
+    },
+    {
+        "ip": "2001:da8:8000:6880:f284:d61c:3c76:f9cb",
+        "user": "ps",
+        "port": 22,
+        "passwd": "glass123456",
+        "path": "/data1/cxh/simswap_plus",
+        "ckp_path": "train_logs",
+        "logfilename": "filestate_machine1.json"
     }
 ]

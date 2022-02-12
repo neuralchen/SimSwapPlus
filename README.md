@@ -1,21 +1,20 @@
 # Simswap++
 
 ## Dependencies
-- python > 3.6
+- python >= 3.7
 - yaml (pip install pyyaml)
 - paramiko (For ssh file transportation)
-- pytorch > 1.8
-- tkinter (For GUI)
+- pytorch >= 1.9
 - pillow
 - torchvision
 - opencv
 - matplotlib
 - timm
+- cupy (for involution) you need to create a new env in anaconda (conda install pytorch==1.10.1 cudatoolkit==10.2.89 cupy==10.1.0 -c pytorch -c conda-forge)
 
 ## logger
 
-- tensorboard (pip install tensorboard)
-- tensorboardX (pip install tensorboardX)
+- wandb (pip install wandb)
 
 ***OR***
 

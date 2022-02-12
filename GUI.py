@@ -5,7 +5,7 @@
 # Created Date: Wednesday December 22nd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 17th January 2022 12:45:32 am
+# Last Modified:  Thursday, 10th February 2022 12:14:47 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -23,6 +23,13 @@ except:
     from pip._internal import main
     main(['install', 'paramiko'])
     import paramiko
+
+try:
+    import pyperclip
+except:
+    from pip._internal import main
+    main(['install', 'pyperclip'])
+    import pyperclip
 
 import threading
 import tkinter as tk
@@ -390,13 +397,18 @@ class Application(tk.Frame):
         ssh_frame.pack(fill="both", padx=5,pady=5)
         ssh_frame.columnconfigure(0, weight=1)
         ssh_frame.columnconfigure(1, weight=1)
+        ssh_frame.columnconfigure(2, weight=1)
         ssh_button = tk.Button(ssh_frame, text = "Open SSH",
                             font=font_list, command = self.OpenSSH, bg='#990033', fg='#F5F5F5')
         ssh_button.grid(row=0,column=0,sticky=tk.EW)
 
+        ssh_button = tk.Button(ssh_frame, text = "Copy Passwd",
+                            font=font_list, command = self.CopyPasswd, bg='#990033', fg='#F5F5F5')
+        ssh_button.grid(row=0,column=1,sticky=tk.EW)
+
         ssh_button = tk.Button(ssh_frame, text = "Pull Log",
                             font=font_list, command = self.PullLog, bg='#990033', fg='#F5F5F5')
-        ssh_button.grid(row=0,column=1,sticky=tk.EW)
+        ssh_button.grid(row=0,column=2,sticky=tk.EW)
 
         #################################################################################################
         config_frame    = tk.Frame(self.master)
@@ -531,6 +543,16 @@ class Application(tk.Frame):
             all_files.append(one_file.name)
         self.test_com["value"] =all_files
         self.test_com.current(0)
+    
+    def CopyPasswd(self):
+        def copy():
+            ip          = self.list_com.get()
+            cur_mac     = self.machine_dict[ip]
+            passwd      = cur_mac["passwd"]
+            pyperclip.copy(passwd)
+
+        thread_update = threading.Thread(target=copy)
+        thread_update.start()
     
     def Test(self):
         def test_task():
