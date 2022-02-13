@@ -5,16 +5,14 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Wednesday, 26th January 2022 2:36:41 pm
+# Last Modified:  Sunday, 13th February 2022 3:03:05 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
 
-from audioop import bias
 import torch
 from torch import nn
-from torch.nn import init
-from torch.nn import functional as F
+from components.DeConv_Invo import DeConv
 
 class InstanceNorm(nn.Module):
     def __init__(self, epsilon=1e-8):
@@ -61,7 +59,7 @@ class ResnetBlock_Adain(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p, bias=False), InstanceNorm()]
+        conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p), InstanceNorm()]
         self.conv1 = nn.Sequential(*conv1)
         self.style1 = ApplyStyle(latent_size, dim)
         self.act1 = activation
@@ -76,7 +74,7 @@ class ResnetBlock_Adain(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p, bias=False), InstanceNorm()]
+        conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), InstanceNorm()]
         self.conv2 = nn.Sequential(*conv2)
         self.style2 = ApplyStyle(latent_size, dim)
 
@@ -101,59 +99,57 @@ class Generator(nn.Module):
         chn         = kwargs["g_conv_dim"]
         k_size      = kwargs["g_kernel_size"]
         res_num     = kwargs["res_num"]
+        in_channel  = kwargs["in_channel"]
         
         padding_size= int((k_size -1)/2)
         padding_type= 'reflect'
         
         activation = nn.ReLU(True)
 
-        self.first_layer = nn.Sequential(nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False),
-                                nn.BatchNorm2d(64), activation)
+        self.first_layer = nn.Sequential(nn.Conv2d(3, in_channel, kernel_size=3, padding=1, bias=False),
+                                nn.BatchNorm2d(in_channel), activation)
         ### downsample
-        self.down1 = nn.Sequential(nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False),
-                                nn.BatchNorm2d(128), activation)
+        self.down1 = nn.Sequential(nn.Conv2d(in_channel, in_channel*2, kernel_size=3, stride=2, padding=1, bias=False),
+                                nn.BatchNorm2d(in_channel*2), activation)
                                 
-        self.down2 = nn.Sequential(nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1, bias=False),
-                                nn.BatchNorm2d(256), activation)
+        self.down2 = nn.Sequential(nn.Conv2d(in_channel*2, in_channel*4, kernel_size=3, stride=2, padding=1, bias=False),
+                                nn.BatchNorm2d(in_channel*4), activation)
 
-        self.down3 = nn.Sequential(nn.Conv2d(256, 512, kernel_size=3, stride=2, padding=1, bias=False),
-                                nn.BatchNorm2d(512), activation)
+        self.down3 = nn.Sequential(nn.Conv2d(in_channel*4, in_channel*8, kernel_size=3, stride=2, padding=1, bias=False),
+                                nn.BatchNorm2d(in_channel*8), activation)
 
-        self.down4 = nn.Sequential(nn.Conv2d(512, 512, kernel_size=3, stride=2, padding=1, bias=False),
-                                nn.BatchNorm2d(512), activation)
+        self.down4 = nn.Sequential(nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, stride=2, padding=1, bias=False),
+                                nn.BatchNorm2d(in_channel*8), activation)
 
         ### resnet blocks
         BN = []
-        for i in range(res_num):
+        for _ in range(res_num):
             BN += [
-                ResnetBlock_Adain(512, latent_size=chn, padding_type=padding_type, activation=activation)]
+                ResnetBlock_Adain(in_channel*8, latent_size=chn,
+                        padding_type=padding_type, activation=activation)]
         self.BottleNeck = nn.Sequential(*BN)
 
         self.up4 = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode='bilinear'),
-            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=False),
-            nn.BatchNorm2d(512), activation
+            DeConv(in_channel*8,in_channel*8,3),
+            nn.BatchNorm2d(in_channel*8), activation
         )
         
         self.up3 = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode='bilinear'),
-            nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=1, bias=False),
-            nn.BatchNorm2d(256), activation
+            DeConv(in_channel*8,in_channel*4,3),
+            nn.BatchNorm2d(in_channel*4), activation
         )
         
         self.up2 = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode='bilinear'),
-            nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1, bias=False),
-            nn.BatchNorm2d(128), activation
+            DeConv(in_channel*4,in_channel*2,3),
+            nn.BatchNorm2d(in_channel*2), activation
         )
 
         self.up1 = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode='bilinear'),
-            nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=1, bias=False),
-            nn.BatchNorm2d(64), activation
+            DeConv(in_channel*2,in_channel,3),
+            nn.BatchNorm2d(in_channel), activation
         )
         
-        self.last_layer = nn.Sequential(nn.Conv2d(64, 3, kernel_size=3, padding=1, bias=False))
+        self.last_layer = nn.Sequential(nn.Conv2d(in_channel, 3, kernel_size=3, padding=1))
 
 
     #     self.__weights_init__()
@@ -167,21 +163,21 @@ class Generator(nn.Module):
     #         if isinstance(layer,nn.Conv2d):
     #             nn.init.xavier_uniform_(layer.weight)
 
-    def forward(self, input, id):
-        x = input  # 3*224*224
-        skip1 = self.first_layer(x)
-        skip2 = self.down1(skip1)
-        skip3 = self.down2(skip2)
-        skip4 = self.down3(skip3)
-        res   = self.down4(skip4)
+    def forward(self, img, id):
+        # x = input  # 3*224*224
+        res = self.first_layer(img)
+        res = self.down1(res)
+        res = self.down2(res)
+        res = self.down3(res)
+        res = self.down4(res)
 
         for i in range(len(self.BottleNeck)):
-            x = self.BottleNeck[i](res, id)
+            res = self.BottleNeck[i](res, id)
 
-        x = self.up4(x)
-        x = self.up3(x)
-        x = self.up2(x)
-        x = self.up1(x)
-        x = self.last_layer(x)
+        res = self.up4(res)
+        res = self.up3(res)
+        res = self.up2(res)
+        res = self.up1(res)
+        res = self.last_layer(res)
 
-        return x
+        return res

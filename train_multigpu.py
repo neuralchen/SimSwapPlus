@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 11th February 2022 12:10:37 am
+# Last Modified:  Sunday, 13th February 2022 2:16:50 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,7 +31,7 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='invoup1',
+    parser.add_argument('-v', '--version', type=str, default='invoup2',
                                             help="version name for train, test, finetune")
     parser.add_argument('-t', '--tag', type=str, default='invo_upsample',
                                             help="tag for current experiment")
@@ -46,7 +46,7 @@ def getParameters():
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="使用involution作为上采样")
+                                default="generator网络前向部分残差的赋值错误，现纠正，重新训练网络")
 
     parser.add_argument('--train_yaml', type=str, default="train_Invoup.yaml")
 

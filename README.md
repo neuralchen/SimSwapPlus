@@ -18,7 +18,7 @@
 
 ***OR***
 
-- wandb (pip install wandb)
+- Do not need to install tensorboard and tensorboardX any more.
 
 ***Logger is an option setting, which can be adjust with train.py --logger [wandb, tensorbaord, None]***
 

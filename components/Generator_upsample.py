@@ -5,7 +5,7 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 10th February 2022 1:01:09 am
+# Last Modified:  Sunday, 13th February 2022 2:15:23 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -104,9 +104,11 @@ class Generator(nn.Module):
         padding_type= 'reflect'
         
         activation = nn.ReLU(True)
-
-        self.first_layer = nn.Sequential(nn.ReflectionPad2d(3), nn.Conv2d(3, 64, kernel_size=7, padding=0, bias=False),
+        
+        self.first_layer = nn.Sequential(nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False),
                                 nn.BatchNorm2d(64), activation)
+        # self.first_layer = nn.Sequential(nn.ReflectionPad2d(3), nn.Conv2d(3, 64, kernel_size=3, padding=0, bias=False),
+        #                         nn.BatchNorm2d(64), activation)
         ### downsample
         self.down1 = nn.Sequential(nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False),
                                 nn.BatchNorm2d(128), activation)
@@ -146,8 +148,9 @@ class Generator(nn.Module):
             DeConv(128,64,3),
             nn.BatchNorm2d(64), activation
         )
-        
-        self.last_layer = nn.Sequential(nn.ReflectionPad2d(3), nn.Conv2d(64, 3, kernel_size=7, padding=0))
+        self.last_layer = nn.Sequential(nn.Conv2d(64, 3, kernel_size=3, padding=1))
+        # self.last_layer = nn.Sequential(nn.ReflectionPad2d(3), nn.Conv2d(64, 3, kernel_size=3, padding=0))
+
 
 
     #     self.__weights_init__()
@@ -161,21 +164,20 @@ class Generator(nn.Module):
     #         if isinstance(layer,nn.Conv2d):
     #             nn.init.xavier_uniform_(layer.weight)
 
-    def forward(self, input, id):
-        x = input  # 3*224*224
-        skip1 = self.first_layer(x)
-        skip2 = self.down1(skip1)
-        skip3 = self.down2(skip2)
-        skip4 = self.down3(skip3)
-        res   = self.down4(skip4)
+    def forward(self, img, id):
+        res = self.first_layer(img)
+        res = self.down1(res)
+        res = self.down2(res)
+        res = self.down3(res)
+        res = self.down4(res)
 
         for i in range(len(self.BottleNeck)):
-            x = self.BottleNeck[i](res, id)
+            res = self.BottleNeck[i](res, id)
 
-        x = self.up4(x)
-        x = self.up3(x)
-        x = self.up2(x)
-        x = self.up1(x)
-        x = self.last_layer(x)
+        res = self.up4(res)
+        res = self.up3(res)
+        res = self.up2(res)
+        res = self.up1(res)
+        res = self.last_layer(res)
 
-        return x
+        return res

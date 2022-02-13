@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 #############################################################
-# File: speed_test.py
-# Created Date: Thursday February 10th 2022
+# File: flops.py
+# Created Date: Sunday February 13th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 13th February 2022 3:04:07 am
+# Last Modified:  Sunday, 13th February 2022 1:37:15 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
+
+
 import os
-import time
 
 import torch
+from thop import profile
+from thop import clever_format
 
 
 
@@ -24,7 +27,7 @@ if __name__ == '__main__':
     model_config={
         "g_conv_dim": 512,
         "g_kernel_size": 3,
-        "in_channel":16,
+        "in_channel":64,
         "res_num": 9
     }
 
@@ -43,22 +46,11 @@ if __name__ == '__main__':
     arcface  = arcface.cuda()
     arcface.eval().requires_grad_(False)
 
+    attr_img    = torch.rand((1,3,512,512)).cuda()
+    id_img      = torch.rand((1,3,112,112)).cuda()
+    id_latent   = torch.rand((1,512)).cuda()
 
-    id_img      = torch.rand((4,3,112,112)).cuda()
-    id_latent   = torch.rand((4,512)).cuda()
-    # cv2.imwrite(os.path.join("./swap_results", "id_%s.png"%(id_basename)),id_img_align_crop[0]
-
-    attr        = torch.rand((4,3,512,512)).cuda()
-    
-    import datetime
-    start_time  = time.time()
-    for i in range(100):
-        with torch.no_grad():
-
-            id_latent   = arcface(id_img)
-
-            results     = model(attr, id_latent)
-            elapsed = time.time() - start_time
-    elapsed = str(datetime.timedelta(seconds=elapsed))
-    information="Elapsed [{}]".format(elapsed)
-    print(information)
+    macs, params = profile(model, inputs=(attr_img, id_latent))
+    macs, params = clever_format([macs, params], "%.3f")
+    print(macs)
+    print(params)
