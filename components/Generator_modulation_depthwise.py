@@ -5,7 +5,7 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 14th February 2022 11:35:32 pm
+# Last Modified:  Tuesday, 15th February 2022 1:54:50 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -119,8 +119,11 @@ class Generator(nn.Module):
 
         # self.first_layer = nn.Sequential(nn.ReflectionPad2d(3), nn.Conv2d(3, 64, kernel_size=7, padding=0, bias=False),
                                 # nn.BatchNorm2d(64), activation)
-        self.first_layer = nn.Sequential(nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False),
+        self.first_layer = nn.Sequential(nn.ReflectionPad2d(1), 
+                              nn.Conv2d(3, 64, kernel_size=3, padding=0, bias=False),
                                 nn.BatchNorm2d(64), activation)
+        # self.first_layer = nn.Sequential(nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False),
+        #                         nn.BatchNorm2d(64), activation)
         ### downsample
         self.down1 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=3, groups=64, padding=1, stride=2),
                                 nn.Conv2d(64, 128, kernel_size=1, bias=False),
@@ -164,7 +167,9 @@ class Generator(nn.Module):
             DeConv(128,64,3),
             nn.BatchNorm2d(64), activation
         )
-        self.last_layer = nn.Sequential(nn.Conv2d(64, 3, kernel_size=3, padding=1))
+        # self.last_layer = nn.Sequential(nn.Conv2d(64, 3, kernel_size=3, padding=1))
+        self.last_layer = nn.Sequential(nn.ReflectionPad2d(1),
+                    nn.Conv2d(64, 3, kernel_size=3, padding=0))
         # self.last_layer = nn.Sequential(nn.ReflectionPad2d(3),
         #             nn.Conv2d(64, 3, kernel_size=7, padding=0))
 

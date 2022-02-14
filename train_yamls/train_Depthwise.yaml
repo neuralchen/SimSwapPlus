@@ -29,7 +29,7 @@ dataloader: VGGFace2HQ_multigpu
 dataset_name: vggface2_hq
 dataset_params:
   random_seed: 1234
-  dataloader_workers: 4
+  dataloader_workers: 6
 
 eval_dataloader: DIV2K_hdf5
 eval_dataset_name: DF2K_H5_Eval
