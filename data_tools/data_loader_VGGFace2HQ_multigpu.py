@@ -5,7 +5,7 @@
 # Created Date: Sunday February 6th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 8th February 2022 10:26:54 pm
+# Last Modified:  Tuesday, 15th February 2022 1:35:41 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -56,6 +56,7 @@ class InfiniteSampler(torch.utils.data.Sampler):
 
 class data_prefetcher():
     def __init__(self, loader, cur_gpu):
+        torch.cuda.set_device(cur_gpu)
         self.loader = loader
         self.dataiter = iter(loader)
         self.stream = torch.cuda.Stream(device=cur_gpu)

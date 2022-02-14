@@ -5,7 +5,7 @@
 # Created Date: Sunday February 13th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 13th February 2022 1:37:15 pm
+# Last Modified:  Monday, 14th February 2022 11:35:11 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -21,7 +21,7 @@ from thop import clever_format
 
 if __name__ == '__main__':
 
-    script      = "Generator_config"
+    script      = "Generator_modulation_depthwise"
     class_name  = "Generator"
     arcface_ckpt= "arcface_ckpt/arcface_checkpoint.tar"
     model_config={

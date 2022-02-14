@@ -1,0 +1,63 @@
+# Related scripts
+train_script_name: multi_gpu
+
+# models' scripts
+model_configs:
+  g_model:
+    script: Generator_modulation_depthwise
+    class_name: Generator
+    module_params:
+      g_conv_dim: 512
+      g_kernel_size: 3
+      res_num: 9
+
+  d_model:
+    script: projected_discriminator
+    class_name: ProjectedDiscriminator
+    module_params:
+      diffaug: False
+      interp224: False
+      backbone_kwargs: {}
+
+arcface_ckpt: arcface_ckpt/arcface_checkpoint.tar
+
+# Training information
+batch_size: 16
+
+# Dataset
+dataloader: VGGFace2HQ_multigpu
+dataset_name: vggface2_hq
+dataset_params:
+  random_seed: 1234
+  dataloader_workers: 4
+
+eval_dataloader: DIV2K_hdf5
+eval_dataset_name: DF2K_H5_Eval
+eval_batch_size: 2
+
+# Dataset
+
+# Optimizer
+optim_type: Adam
+g_optim_config:
+  lr:  0.0004
+  betas: [ 0, 0.99]
+  eps: !!float 1e-8
+
+d_optim_config:
+  lr:  0.0004
+  betas: [ 0, 0.99]
+  eps: !!float 1e-8
+
+id_weight: 20.0
+reconstruct_weight: 10.0
+feature_match_weight: 10.0
+
+# Log 
+log_step: 300
+model_save_step: 10000
+sample_step: 1000
+total_step: 1000000
+checkpoint_names:
+  generator_name: Generator
+  discriminator_name: Discriminator

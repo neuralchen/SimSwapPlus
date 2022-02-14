@@ -5,7 +5,7 @@
 # Created Date: Sunday January 9th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 15th February 2022 12:00:24 am
+# Last Modified:  Tuesday, 15th February 2022 1:25:28 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -324,13 +324,15 @@ def train_loop(
         logo_class.print_start_training()
 
     dis.feature_network.requires_grad_(False)
-    
+    # dataloader = iter(dataloader)
     for step in range(start, total_step):
         gen.train()
         dis.train()
         for interval in range(2):
             random.shuffle(randindex)
             src_image1, src_image2  = dataloader.next()
+            # src_image1, src_image2  = next(dataloader)
+            # src_image1, src_image2  = src_image1.to(device), src_image2.to(device)
             # if rank ==0:
                 
             #     elapsed = time.time() - start_time

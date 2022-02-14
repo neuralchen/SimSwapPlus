@@ -5,7 +5,7 @@
 # Created Date: Thursday February 10th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 13th February 2022 3:04:07 am
+# Last Modified:  Monday, 14th February 2022 4:44:38 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -18,7 +18,7 @@ import torch
 
 if __name__ == '__main__':
 
-    script      = "Generator_config"
+    script      = "Generator_modulation_depthwise"
     class_name  = "Generator"
     arcface_ckpt= "arcface_ckpt/arcface_checkpoint.tar"
     model_config={

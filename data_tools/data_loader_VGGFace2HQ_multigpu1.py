@@ -5,7 +5,7 @@
 # Created Date: Sunday February 6th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 8th February 2022 1:24:27 pm
+# Last Modified:  Tuesday, 15th February 2022 1:35:06 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -56,11 +56,12 @@ class InfiniteSampler(torch.utils.data.Sampler):
 
 class data_prefetcher():
     def __init__(self, loader, cur_gpu):
+        torch.cuda.set_device(cur_gpu) # must add this line to avoid excessive use of GPU 0 by the prefetcher
         self.loader = loader
         self.dataiter = iter(loader)
         self.stream = torch.cuda.Stream(device=cur_gpu)
-        self.mean = torch.tensor([0.485, 0.456, 0.406]).cuda(device=cur_gpu).view(1,3,1,1)
-        self.std = torch.tensor([0.229, 0.224, 0.225]).cuda(device=cur_gpu).view(1,3,1,1)
+        self.mean = torch.tensor([0.485, 0.456, 0.406]).to(cur_gpu).view(1,3,1,1)
+        self.std = torch.tensor([0.229, 0.224, 0.225]).to(cur_gpu).view(1,3,1,1)
         self.cur_gpu = cur_gpu
         # With Amp, it isn't necessary to manually convert data to half.
         # if args.fp16:
@@ -77,9 +78,9 @@ class data_prefetcher():
         #     self.src_image1, self.src_image2 = next(self.dataiter)
             
         with torch.cuda.stream(self.stream):
-            self.src_image1  = self.src_image1.cuda(device= self.cur_gpu, non_blocking=True)
+            self.src_image1  = self.src_image1.to(self.cur_gpu, non_blocking=True)
             self.src_image1  = self.src_image1.sub_(self.mean).div_(self.std)
-            self.src_image2  = self.src_image2.cuda(device= self.cur_gpu, non_blocking=True)
+            self.src_image2  = self.src_image2.to(self.cur_gpu, non_blocking=True)
             self.src_image2  = self.src_image2.sub_(self.mean).div_(self.std)
             # With Amp, it isn't necessary to manually convert data to half.
             # if args.fp16:
@@ -171,13 +172,13 @@ def GetLoader(  dataset_roots,
                             "jpg",
                             random_seed)
     device = torch.device('cuda', rank)
-    # sampler = InfiniteSampler(dataset=content_dataset, rank=rank, num_replicas=num_gpus, seed=random_seed)
+    sampler = InfiniteSampler(dataset=content_dataset, rank=rank, num_replicas=num_gpus, seed=random_seed)
     # content_data_loader = data.DataLoader(dataset=content_dataset,batch_size=batch_size,
     #                 drop_last=False,shuffle=False,num_workers=num_workers,pin_memory=True, sampler=sampler)
     content_data_loader = data.DataLoader(dataset=content_dataset,batch_size=batch_size,
-                    drop_last=False,shuffle=True,num_workers=num_workers,pin_memory=True)
-    # prefetcher = data_prefetcher(content_data_loader,device)
-    return content_data_loader
+                    drop_last=False,shuffle=False,num_workers=num_workers,pin_memory=True, sampler=sampler)
+    prefetcher = data_prefetcher(content_data_loader,device)
+    return prefetcher
 
 def denorm(x):
     out = (x + 1) / 2
