@@ -5,7 +5,7 @@
 # Created Date: Thursday February 10th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 14th February 2022 4:44:38 pm
+# Last Modified:  Tuesday, 15th February 2022 12:54:56 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -18,11 +18,11 @@ import torch
 
 if __name__ == '__main__':
 
-    script      = "Generator_modulation_depthwise"
+    script      = "Generator_modulation_depthwise_config"
     class_name  = "Generator"
     arcface_ckpt= "arcface_ckpt/arcface_checkpoint.tar"
     model_config={
-        "g_conv_dim": 512,
+        "id_dim": 512,
         "g_kernel_size": 3,
         "in_channel":16,
         "res_num": 9

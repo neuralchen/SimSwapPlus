@@ -5,26 +5,26 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 13th February 2022 3:03:05 am
+# Last Modified:  Tuesday, 15th February 2022 12:52:22 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
 
 import torch
 from torch import nn
-from components.DeConv_Invo import DeConv
+from components.DeConv_Depthwise import DeConv
+# from components.DeConv_Invo import DeConv
 
-class InstanceNorm(nn.Module):
+class Demodule(nn.Module):
     def __init__(self, epsilon=1e-8):
         """
             @notice: avoid in-place ops.
             https://discuss.pytorch.org/t/encounter-the-runtimeerror-one-of-the-variables-needed-for-gradient-computation-has-been-modified-by-an-inplace-operation/836/3
         """
-        super(InstanceNorm, self).__init__()
+        super(Demodule, self).__init__()
         self.epsilon = epsilon
 
     def forward(self, x):
-        x   = x - torch.mean(x, (2, 3), True)
         tmp = torch.mul(x, x) # or x ** 2
         tmp = torch.rsqrt(torch.mean(tmp, (2, 3), True) + self.epsilon)
         return x * tmp
@@ -45,9 +45,22 @@ class ApplyStyle(nn.Module):
         x = x * (style[:, 0] * 1 + 1.) + style[:, 1] * 1
         return x
 
-class ResnetBlock_Adain(nn.Module):
+class Modulation(nn.Module):
+    def __init__(self, latent_size, channels):
+        super(Modulation, self).__init__()
+        self.linear = nn.Linear(latent_size, channels)
+
+    def forward(self, x, latent):
+        style = self.linear(latent)  # style => [batch_size, n_channels*2]
+        shape = [-1, x.size(1), 1, 1]
+        style = style.view(shape)    # [batch_size, 2, n_channels, ...]
+        #x = x * (style[:, 0] + 1.) + style[:, 1]
+        x = x * style
+        return x
+
+class ResnetBlock_Modulation(nn.Module):
     def __init__(self, dim, latent_size, padding_type, activation=nn.ReLU(True)):
-        super(ResnetBlock_Adain, self).__init__()
+        super(ResnetBlock_Modulation, self).__init__()
 
         p = 0
         conv1 = []
@@ -59,9 +72,9 @@ class ResnetBlock_Adain(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p), InstanceNorm()]
+        conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p), Demodule()]
         self.conv1 = nn.Sequential(*conv1)
-        self.style1 = ApplyStyle(latent_size, dim)
+        self.style1 = Modulation(latent_size, dim)
         self.act1 = activation
 
         p = 0
@@ -74,9 +87,9 @@ class ResnetBlock_Adain(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), InstanceNorm()]
+        conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), Demodule()]
         self.conv2 = nn.Sequential(*conv2)
-        self.style2 = ApplyStyle(latent_size, dim)
+        self.style2 = Modulation(latent_size, dim)
 
 
     def forward(self, x, dlatents_in_slice):
@@ -88,7 +101,6 @@ class ResnetBlock_Adain(nn.Module):
         out = x + y
         return out
 
-
 class Generator(nn.Module):
     def __init__(
                 self,
@@ -96,7 +108,7 @@ class Generator(nn.Module):
                 ):
         super().__init__()
 
-        chn         = kwargs["g_conv_dim"]
+        id_dim      = kwargs["id_dim"]
         k_size      = kwargs["g_kernel_size"]
         res_num     = kwargs["res_num"]
         in_channel  = kwargs["in_channel"]
@@ -106,27 +118,35 @@ class Generator(nn.Module):
         
         activation = nn.ReLU(True)
 
-        self.first_layer = nn.Sequential(nn.Conv2d(3, in_channel, kernel_size=3, padding=1, bias=False),
+        # self.first_layer = nn.Sequential(nn.ReflectionPad2d(3), nn.Conv2d(3, 64, kernel_size=7, padding=0, bias=False),
+                                # nn.BatchNorm2d(64), activation)
+        self.first_layer = nn.Sequential(nn.ReflectionPad2d(1), 
+                              nn.Conv2d(3, in_channel, kernel_size=3, padding=0, bias=False),
                                 nn.BatchNorm2d(in_channel), activation)
+        # self.first_layer = nn.Sequential(nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False),
+        #                         nn.BatchNorm2d(64), activation)
         ### downsample
-        self.down1 = nn.Sequential(nn.Conv2d(in_channel, in_channel*2, kernel_size=3, stride=2, padding=1, bias=False),
+        self.down1 = nn.Sequential(nn.Conv2d(in_channel, in_channel, kernel_size=3, groups=in_channel, padding=1, stride=2),
+                                nn.Conv2d(in_channel, in_channel*2, kernel_size=1, bias=False),
                                 nn.BatchNorm2d(in_channel*2), activation)
                                 
-        self.down2 = nn.Sequential(nn.Conv2d(in_channel*2, in_channel*4, kernel_size=3, stride=2, padding=1, bias=False),
+        self.down2 = nn.Sequential(nn.Conv2d(in_channel*2, in_channel*2, kernel_size=3, groups=in_channel*2, padding=1, stride=2),
+                                nn.Conv2d(in_channel*2, in_channel*4, kernel_size=1, bias=False),
                                 nn.BatchNorm2d(in_channel*4), activation)
 
-        self.down3 = nn.Sequential(nn.Conv2d(in_channel*4, in_channel*8, kernel_size=3, stride=2, padding=1, bias=False),
+        self.down3 = nn.Sequential(nn.Conv2d(in_channel*4, in_channel*4, kernel_size=3, groups=in_channel*4, padding=1, stride=2),
+                                nn.Conv2d(in_channel*4, in_channel*8, kernel_size=1, bias=False),
                                 nn.BatchNorm2d(in_channel*8), activation)
 
-        self.down4 = nn.Sequential(nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, stride=2, padding=1, bias=False),
+        self.down4 = nn.Sequential(nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, groups=in_channel*8, padding=1, stride=2),
+                                nn.Conv2d(in_channel*8, in_channel*8, kernel_size=1, bias=False),
                                 nn.BatchNorm2d(in_channel*8), activation)
 
         ### resnet blocks
         BN = []
-        for _ in range(res_num):
+        for i in range(res_num):
             BN += [
-                ResnetBlock_Adain(in_channel*8, latent_size=chn,
-                        padding_type=padding_type, activation=activation)]
+                ResnetBlock_Modulation(in_channel*8, latent_size=id_dim, padding_type=padding_type, activation=activation)]
         self.BottleNeck = nn.Sequential(*BN)
 
         self.up4 = nn.Sequential(
@@ -148,8 +168,11 @@ class Generator(nn.Module):
             DeConv(in_channel*2,in_channel,3),
             nn.BatchNorm2d(in_channel), activation
         )
-        
-        self.last_layer = nn.Sequential(nn.Conv2d(in_channel, 3, kernel_size=3, padding=1))
+        # self.last_layer = nn.Sequential(nn.Conv2d(64, 3, kernel_size=3, padding=1))
+        self.last_layer = nn.Sequential(nn.ReflectionPad2d(1),
+                    nn.Conv2d(in_channel, 3, kernel_size=3, padding=0))
+        # self.last_layer = nn.Sequential(nn.ReflectionPad2d(3),
+        #             nn.Conv2d(64, 3, kernel_size=7, padding=0))
 
 
     #     self.__weights_init__()
@@ -164,7 +187,6 @@ class Generator(nn.Module):
     #             nn.init.xavier_uniform_(layer.weight)
 
     def forward(self, img, id):
-        # x = input  # 3*224*224
         res = self.first_layer(img)
         res = self.down1(res)
         res = self.down2(res)

@@ -5,7 +5,7 @@
 # Created Date: Sunday February 13th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 14th February 2022 11:35:11 pm
+# Last Modified:  Tuesday, 15th February 2022 12:52:53 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -21,15 +21,16 @@ from thop import clever_format
 
 if __name__ == '__main__':
 
-    script      = "Generator_modulation_depthwise"
+    script      = "Generator_modulation_depthwise_config"
     class_name  = "Generator"
     arcface_ckpt= "arcface_ckpt/arcface_checkpoint.tar"
     model_config={
-        "g_conv_dim": 512,
+        "id_dim": 512,
         "g_kernel_size": 3,
-        "in_channel":64,
+        "in_channel":16,
         "res_num": 9
     }
+
 
     os.environ['CUDA_VISIBLE_DEVICES'] = str(0)
     print("GPU used : ", os.environ['CUDA_VISIBLE_DEVICES'])
