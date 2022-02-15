@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Monday, 14th February 2022 11:54:02 pm
+# Last Modified:  Tuesday, 15th February 2022 12:06:30 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,9 +31,9 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='depthwise',
+    parser.add_argument('-v', '--version', type=str, default='oriae_modulation',
                                             help="version name for train, test, finetune")
-    parser.add_argument('-t', '--tag', type=str, default='depthwise_conv',
+    parser.add_argument('-t', '--tag', type=str, default='oriae_modulation',
                                             help="tag for current experiment")
 
     parser.add_argument('-p', '--phase', type=str, default="train",
@@ -46,13 +46,13 @@ def getParameters():
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="使用depthwise卷积作为基础算子测试性能")
+                                default="验证是否是Decoder导致的发紫")
 
-    parser.add_argument('--train_yaml', type=str, default="train_Depthwise.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_oriae_modulation.yaml")
 
     # system logger
     parser.add_argument('--logger', type=str,
-                  default="wandb", choices=['tensorboard', 'wandb','none'], help='system logger')
+                  default="tensorboard", choices=['tensorboard', 'wandb','none'], help='system logger')
 
     # # logs (does not to be changed in most time)
     # parser.add_argument('--dataloader_workers', type=int, default=6)
