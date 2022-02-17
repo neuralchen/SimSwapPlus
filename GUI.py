@@ -5,7 +5,7 @@
 # Created Date: Wednesday December 22nd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 10th February 2022 12:14:47 am
+# Last Modified:  Thursday, 17th February 2022 10:47:35 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -542,7 +542,8 @@ class Application(tk.Frame):
         for one_file in files:
             all_files.append(one_file.name)
         self.test_com["value"] =all_files
-        self.test_com.current(0)
+        if len(all_files):
+            self.test_com.current(0)
     
     def CopyPasswd(self):
         def copy():
