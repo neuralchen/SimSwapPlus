@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 17th February 2022 10:23:54 am
+# Last Modified:  Thursday, 17th February 2022 7:00:12 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -34,7 +34,7 @@ def getParameters():
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=300000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=510000,
                                             help="checkpoint epoch for test phase or finetune phase")
 
     # test
@@ -44,9 +44,9 @@ def getParameters():
                                             choices=['localhost', '4card','8card','new4card'])
 
 
-    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\gxt3.jpeg')
+    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\dlrb2.jpeg')
     # parser.add_argument('-i', '--id_imgs', type=str, default='G:\\VGGFace2-HQ\\VGGface2_ffhq_align_256_9_28_512_bygfpgan\\n000002\\0027_01.jpg')
-    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\8',
+    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\ID',
                                                 help="file path for attribute images or video")
     
     parser.add_argument('--use_specified_data', action='store_true')
