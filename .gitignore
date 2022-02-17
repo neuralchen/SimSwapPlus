@@ -130,3 +130,7 @@ test_logs/
 arcface_ckpt/
 insightface_func/
 parsing_model/
+
+*.rar
+*.zip
+*.tar

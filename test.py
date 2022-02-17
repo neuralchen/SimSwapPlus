@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 30th January 2022 4:05:17 pm
+# Last Modified:  Thursday, 17th February 2022 10:23:54 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -30,11 +30,11 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='GramFM',
+    parser.add_argument('-v', '--version', type=str, default='depthwise',
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=480000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=300000,
                                             help="checkpoint epoch for test phase or finetune phase")
 
     # test
@@ -44,8 +44,9 @@ def getParameters():
                                             choices=['localhost', '4card','8card','new4card'])
 
 
-    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\dlrb2.jpeg')
-    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\ID',
+    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\gxt3.jpeg')
+    # parser.add_argument('-i', '--id_imgs', type=str, default='G:\\VGGFace2-HQ\\VGGface2_ffhq_align_256_9_28_512_bygfpgan\\n000002\\0027_01.jpg')
+    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\8',
                                                 help="file path for attribute images or video")
     
     parser.add_argument('--use_specified_data', action='store_true')

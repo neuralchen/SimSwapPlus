@@ -5,7 +5,7 @@
 # Created Date: Thursday February 10th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 15th February 2022 12:54:56 pm
+# Last Modified:  Thursday, 17th February 2022 2:33:30 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -13,19 +13,26 @@ import os
 import time
 
 import torch
+from    torch.backends import cudnn
 
 
 
 if __name__ == '__main__':
-
+    # cudnn.benchmark = True
+    # cudnn.enabled   = True
+    # script      = "Generator_modulation_up"
     script      = "Generator_modulation_depthwise_config"
+    # script      = "Generator_ori_config"
     class_name  = "Generator"
     arcface_ckpt= "arcface_ckpt/arcface_checkpoint.tar"
     model_config={
         "id_dim": 512,
         "g_kernel_size": 3,
         "in_channel":16,
-        "res_num": 9
+        "res_num": 9,
+        # "up_mode": "nearest",
+        "up_mode": "bilinear",
+        "res_mode": "depthwise"
     }
 
     os.environ['CUDA_VISIBLE_DEVICES'] = str(0)

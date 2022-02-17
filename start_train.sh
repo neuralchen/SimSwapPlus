@@ -1,3 +1,3 @@
 
 
-nohup python train.py > GramFM.log 2>&1 &
+nohup python train_multigpu.py > depthwise_config0.log 2>&1 &

@@ -5,7 +5,7 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 15th February 2022 12:40:14 pm
+# Last Modified:  Wednesday, 16th February 2022 1:39:02 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -131,22 +131,26 @@ class Generator(nn.Module):
         self.BottleNeck = nn.Sequential(*BN)
 
         self.up4 = nn.Sequential(
-            DeConv(in_channel*8,in_channel*8,3),
+            nn.Upsample(scale_factor=2, mode='bilinear'),
+            nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel*8), activation
         )
         
         self.up3 = nn.Sequential(
-            DeConv(in_channel*8,in_channel*4,3),
+            nn.Upsample(scale_factor=2, mode='bilinear'),
+            nn.Conv2d(in_channel*8, in_channel*4, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel*4), activation
         )
         
         self.up2 = nn.Sequential(
-            DeConv(in_channel*4,in_channel*2,3),
+            nn.Upsample(scale_factor=2, mode='bilinear'),
+            nn.Conv2d(in_channel*4, in_channel*2, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel*2), activation
         )
 
         self.up1 = nn.Sequential(
-            DeConv(in_channel*2,in_channel,3),
+            nn.Upsample(scale_factor=2, mode='bilinear'),
+            nn.Conv2d(in_channel*2, in_channel, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel), activation
         )
         self.last_layer = nn.Sequential(nn.ReflectionPad2d(1),

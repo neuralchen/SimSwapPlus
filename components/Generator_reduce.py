@@ -5,7 +5,7 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 13th February 2022 3:47:59 am
+# Last Modified:  Wednesday, 16th February 2022 10:15:11 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -119,6 +119,7 @@ class Generator(nn.Module):
 
         self.first_layer = nn.Sequential(nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False),
                                 nn.BatchNorm2d(64), activation)
+                                
         ### downsample
         self.down1 = nn.Sequential(nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False),
                                 nn.BatchNorm2d(128), activation)
