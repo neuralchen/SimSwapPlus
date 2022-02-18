@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 18th February 2022 10:47:55 am
+# Last Modified:  Friday, 18th February 2022 5:00:28 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -87,6 +87,7 @@ class Tester(object):
         ckp_step    = self.config["checkpoint_step"]
         version     = self.config["version"]
         id_imgs     = self.config["id_imgs"]
+        crop_mode   = self.config["crop_mode"]
         attr_files  = self.config["attr_files"]
         specified_save_path = self.config["specified_save_path"]
         self.arcface_ckpt= self.config["arcface_ckpt"]
@@ -113,7 +114,9 @@ class Tester(object):
         # models
         self.__init_framework__()
 
-        mode        = None
+        mode        = crop_mode.lower()
+        if mode == "vggface":
+            mode = "none"
         self.detect = Face_detect_crop(name='antelope', root='./insightface_func/models')
         self.detect.prepare(ctx_id = 0, det_thresh=0.6, det_size=(640,640),mode = mode)
         
