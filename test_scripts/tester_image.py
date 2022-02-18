@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 17th February 2022 7:12:56 pm
+# Last Modified:  Friday, 18th February 2022 10:47:55 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -88,10 +88,15 @@ class Tester(object):
         version     = self.config["version"]
         id_imgs     = self.config["id_imgs"]
         attr_files  = self.config["attr_files"]
+        specified_save_path = self.config["specified_save_path"]
         self.arcface_ckpt= self.config["arcface_ckpt"]
         imgs_list = []
 
         self.reporter.writeInfo("Version %s"%version)
+
+        if os.path.isdir(specified_save_path):
+            print("Input a legal specified save path!")
+            save_dir = specified_save_path
 
         if os.path.isdir(attr_files):
             print("Input a dir....")

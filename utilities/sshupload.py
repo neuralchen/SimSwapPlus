@@ -5,12 +5,13 @@
 # Created Date: Tuesday September 24th 2019
 # Author: Lcx
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 12th January 2021 2:02:12 pm
+# Last Modified:  Friday, 18th February 2022 3:20:14 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2019 Shanghai Jiao Tong University
 #############################################################
 
 import paramiko,os
+from pathlib import Path
 # ssh传输类：
 
 class fileUploaderClass(object):
@@ -49,6 +50,28 @@ class fileUploaderClass(object):
         sftp = self.__ssh__.open_sftp()
         wocao = sftp.listdir(remoteDir)
         return wocao
+    
+    def sshScpGetDir(self, remoteDir, localDir, showProgress=False):
+        self.__ssh__.connect(self.__ip__, self.__port__, self.__userName__, self.__passWd__)
+        sftp = paramiko.SFTPClient.from_transport(self.__ssh__.get_transport())
+        sftp = self.__ssh__.open_sftp()
+        try:
+            sftp.stat(remoteDir)
+            print("Remote dir exists!")
+        except:
+            print("Remote dir does not exist!")
+            return False
+        files = sftp.listdir(remoteDir)
+        for i_f in files:
+            i_remote_file = Path(remoteDir,i_f).as_posix()
+            local_file    = Path(localDir,i_f)
+            if showProgress:
+                sftp.get(i_remote_file, local_file,callback=self.__putCallBack__)
+            else:
+                sftp.get(i_remote_file, local_file)
+        sftp.close()
+        self.__ssh__.close()
+        return True
     
     def sshScpGet(self, remoteFile, localFile, showProgress=False):
         self.__ssh__.connect(self.__ip__, self.__port__, self.__userName__, self.__passWd__)
