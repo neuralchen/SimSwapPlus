@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 18th February 2022 3:59:57 pm
+# Last Modified:  Saturday, 19th February 2022 11:46:06 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -30,21 +30,21 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='depthwise',
+    parser.add_argument('-v', '--version', type=str, default='depthwise_config0', # depthwise depthwise_config0
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=680000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=170000,
                                             help="checkpoint epoch for test phase or finetune phase")
 
     # test
     parser.add_argument('-t', '--test_script_name', type=str, default='image')
     parser.add_argument('-b', '--batch_size', type=int, default=1)
-    parser.add_argument('-n', '--node_ip', type=str, default='2001:da8:8000:6880:f284:d61c:3c76:f9cb')
+    parser.add_argument('-n', '--node_ip', type=str, default='101.33.242.26') # 101.33.242.26 2001:da8:8000:6880:f284:d61c:3c76:f9cb
     parser.add_argument('--crop_mode', type=str, default="vggface", choices=['ffhq','vggface'], help='crop mode for face detector')
 
 
-    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\dlrb2.jpeg')
+    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\gxt3.jpeg')
     # parser.add_argument('-i', '--id_imgs', type=str, default='G:\\VGGFace2-HQ\\VGGface2_ffhq_align_256_9_28_512_bygfpgan\\n000002\\0027_01.jpg')
     parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\ID',
                                                 help="file path for attribute images or video")
