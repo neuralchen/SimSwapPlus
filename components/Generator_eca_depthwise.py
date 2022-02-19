@@ -5,14 +5,14 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 15th February 2022 1:54:50 am
+# Last Modified:  Saturday, 19th February 2022 6:25:38 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
 
 import torch
 from torch import nn
-from components.DeConv_Depthwise import DeConv
+
 # from components.DeConv_Invo import DeConv
 
 class Demodule(nn.Module):
@@ -29,21 +29,6 @@ class Demodule(nn.Module):
         tmp = torch.rsqrt(torch.mean(tmp, (2, 3), True) + self.epsilon)
         return x * tmp
 
-class ApplyStyle(nn.Module):
-    """
-        @ref: https://github.com/lernapparat/lernapparat/blob/master/style_gan/pytorch_style_gan.ipynb
-    """
-    def __init__(self, latent_size, channels):
-        super(ApplyStyle, self).__init__()
-        self.linear = nn.Linear(latent_size, channels * 2)
-
-    def forward(self, x, latent):
-        style = self.linear(latent)  # style => [batch_size, n_channels*2]
-        shape = [-1, 2, x.size(1), 1, 1]
-        style = style.view(shape)    # [batch_size, 2, n_channels, ...]
-        #x = x * (style[:, 0] + 1.) + style[:, 1]
-        x = x * (style[:, 0] * 1 + 1.) + style[:, 1] * 1
-        return x
 
 class Modulation(nn.Module):
     def __init__(self, latent_size, channels):
@@ -59,7 +44,7 @@ class Modulation(nn.Module):
         return x
 
 class ResnetBlock_Modulation(nn.Module):
-    def __init__(self, dim, latent_size, padding_type, activation=nn.ReLU(True)):
+    def __init__(self, dim, latent_size, padding_type, activation=nn.ReLU(True),res_mode="depthwise"):
         super(ResnetBlock_Modulation, self).__init__()
 
         p = 0
@@ -72,7 +57,17 @@ class ResnetBlock_Modulation(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p), Demodule()]
+        if res_mode.lower() == "conv":
+            conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p), Demodule()]
+        elif res_mode.lower() == "depthwise":
+            conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
+                    nn.Conv2d(dim, dim, kernel_size=1),
+                    Demodule()]
+        elif res_mode.lower() == "depthwise_eca":
+            from components.ECA_Depthwise_Conv import ECADW
+            conv1 += [ECADW(dim, kernel_size=3, padding=p, stride=2),
+                nn.Conv2d(dim, dim, kernel_size=1),
+                Demodule()]
         self.conv1 = nn.Sequential(*conv1)
         self.style1 = Modulation(latent_size, dim)
         self.act1 = activation
@@ -87,17 +82,30 @@ class ResnetBlock_Modulation(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), Demodule()]
+        if res_mode.lower() == "conv":
+            conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), Demodule()]
+        elif res_mode.lower() == "depthwise":
+            conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1),
+                Demodule()]
+        elif res_mode.lower() == "depthwise_eca":
+            from components.ECA_Depthwise_Conv import ECADW
+            conv2 += [ECADW(dim, kernel_size=3, padding=p, stride=2),
+                nn.Conv2d(dim, dim, kernel_size=1),
+                Demodule()]
+        
         self.conv2 = nn.Sequential(*conv2)
         self.style2 = Modulation(latent_size, dim)
 
 
     def forward(self, x, dlatents_in_slice):
-        y = self.conv1(x)
-        y = self.style1(y, dlatents_in_slice)
+        y = self.style1(x, dlatents_in_slice)
+        y = self.conv1(y)
+        
         y = self.act1(y)
-        y = self.conv2(y)
         y = self.style2(y, dlatents_in_slice)
+        y = self.conv2(y)
+        
         out = x + y
         return out
 
@@ -108,68 +116,84 @@ class Generator(nn.Module):
                 ):
         super().__init__()
 
-        chn         = kwargs["g_conv_dim"]
+        id_dim      = kwargs["id_dim"]
         k_size      = kwargs["g_kernel_size"]
         res_num     = kwargs["res_num"]
+        in_channel  = kwargs["in_channel"]
+        up_mode     = kwargs["up_mode"]
+        res_mode    = kwargs["res_mode"]
+        conv_mode   = kwargs["conv_mode"]
         
         padding_size= int((k_size -1)/2)
         padding_type= 'reflect'
         
         activation = nn.ReLU(True)
 
+        from components.ECA_Depthwise_Conv import ECADW
+
         # self.first_layer = nn.Sequential(nn.ReflectionPad2d(3), nn.Conv2d(3, 64, kernel_size=7, padding=0, bias=False),
                                 # nn.BatchNorm2d(64), activation)
         self.first_layer = nn.Sequential(nn.ReflectionPad2d(1), 
-                              nn.Conv2d(3, 64, kernel_size=3, padding=0, bias=False),
-                                nn.BatchNorm2d(64), activation)
+                                nn.Conv2d(3, in_channel, kernel_size=3, padding=0, bias=False),
+                                nn.BatchNorm2d(in_channel), activation)
         # self.first_layer = nn.Sequential(nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False),
         #                         nn.BatchNorm2d(64), activation)
         ### downsample
-        self.down1 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=3, groups=64, padding=1, stride=2),
-                                nn.Conv2d(64, 128, kernel_size=1, bias=False),
-                                nn.BatchNorm2d(128), activation)
+        self.down1 = nn.Sequential(ECADW(in_channel,kernel_size=3, padding=1, stride=2),
+                                nn.Conv2d(in_channel, in_channel*2, kernel_size=1, bias=False),
+                                nn.BatchNorm2d(in_channel*2), activation)
                                 
-        self.down2 = nn.Sequential(nn.Conv2d(128, 128, kernel_size=3, groups=128, padding=1, stride=2),
-                                nn.Conv2d(128, 256, kernel_size=1, bias=False),
-                                nn.BatchNorm2d(256), activation)
+        self.down2 = nn.Sequential(ECADW(in_channel*2, kernel_size=3, padding=1, stride=2),
+                                nn.Conv2d(in_channel*2, in_channel*4, kernel_size=1, bias=False),
+                                nn.BatchNorm2d(in_channel*4), activation)
 
-        self.down3 = nn.Sequential(nn.Conv2d(256, 256, kernel_size=3, groups=256, padding=1, stride=2),
-                                nn.Conv2d(256, 512, kernel_size=1, bias=False),
-                                nn.BatchNorm2d(512), activation)
+        self.down3 = nn.Sequential(ECADW(in_channel*4, kernel_size=3, padding=1, stride=2),
+                                nn.Conv2d(in_channel*4, in_channel*8, kernel_size=1, bias=False),
+                                nn.BatchNorm2d(in_channel*8), activation)
 
-        self.down4 = nn.Sequential(nn.Conv2d(512, 512, kernel_size=3, groups=512, padding=1, stride=2),
-                                nn.Conv2d(512, 512, kernel_size=1, bias=False),
-                                nn.BatchNorm2d(512), activation)
+        self.down4 = nn.Sequential(ECADW(in_channel*8, kernel_size=3, padding=1, stride=2),
+                                nn.Conv2d(in_channel*8, in_channel*8, kernel_size=1, bias=False),
+                                nn.BatchNorm2d(in_channel*8), activation)
 
         ### resnet blocks
         BN = []
         for i in range(res_num):
             BN += [
-                ResnetBlock_Modulation(512, latent_size=chn, padding_type=padding_type, activation=activation)]
+                ResnetBlock_Modulation(in_channel*8, latent_size=id_dim, padding_type=padding_type, activation=activation)]
         self.BottleNeck = nn.Sequential(*BN)
 
+        if conv_mode.lower() == "conv":
+            from components.DeConv import DeConv
+            Deconv = DeConv
+        elif conv_mode.lower() == "depthwise":
+            from components.DeConv_Depthwise import DeConv
+            Deconv = DeConv
+        elif conv_mode.lower() == "depthwise_eca":
+            from components.DeConv_Depthwise_ECA import DeConv
+            Deconv = DeConv
+
         self.up4 = nn.Sequential(
-            DeConv(512,512,3),
-            nn.BatchNorm2d(512), activation
+            DeConv(in_channel*8,in_channel*8,3),
+            nn.BatchNorm2d(in_channel*8), activation
         )
         
         self.up3 = nn.Sequential(
-            DeConv(512,256,3),
-            nn.BatchNorm2d(256), activation
+            DeConv(in_channel*8,in_channel*4,3),
+            nn.BatchNorm2d(in_channel*4), activation
         )
         
         self.up2 = nn.Sequential(
-            DeConv(256,128,3),
-            nn.BatchNorm2d(128), activation
+            DeConv(in_channel*4,in_channel*2,3),
+            nn.BatchNorm2d(in_channel*2), activation
         )
 
         self.up1 = nn.Sequential(
-            DeConv(128,64,3),
-            nn.BatchNorm2d(64), activation
+            DeConv(in_channel*2,in_channel,3),
+            nn.BatchNorm2d(in_channel), activation
         )
         # self.last_layer = nn.Sequential(nn.Conv2d(64, 3, kernel_size=3, padding=1))
         self.last_layer = nn.Sequential(nn.ReflectionPad2d(1),
-                    nn.Conv2d(64, 3, kernel_size=3, padding=0))
+                    nn.Conv2d(in_channel, 3, kernel_size=3, padding=0))
         # self.last_layer = nn.Sequential(nn.ReflectionPad2d(3),
         #             nn.Conv2d(64, 3, kernel_size=7, padding=0))
 
