@@ -61,6 +61,7 @@ d_optim_config:
 id_weight: 20.0
 reconstruct_weight: 10.0
 feature_match_weight: 10.0
+distillation_weight: 10.0
 
 # Log 
 log_step: 300
