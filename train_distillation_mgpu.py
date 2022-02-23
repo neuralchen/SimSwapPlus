@@ -5,12 +5,13 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Wednesday, 23rd February 2022 12:42:54 am
+# Last Modified:  Wednesday, 23rd February 2022 2:30:03 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
 
 
+from curses.panel import version
 import  os
 import  shutil
 import  argparse 
@@ -18,6 +19,7 @@ from    torch.backends import cudnn
 from    utilities.json_config import readConfig, writeConfig
 from    utilities.reporter import Reporter
 from    utilities.yaml_config import getConfigYaml
+
 
 
 def str2bool(v):
@@ -31,9 +33,9 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='depthwise_config0',
+    parser.add_argument('-v', '--version', type=str, default='distillation',
                                             help="version name for train, test, finetune")
-    parser.add_argument('-t', '--tag', type=str, default='tiny',
+    parser.add_argument('-t', '--tag', type=str, default='distillation',
                                             help="tag for current experiment")
 
     parser.add_argument('-p', '--phase', type=str, default="train",
@@ -46,13 +48,13 @@ def getParameters():
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="尝试直接训练最小规模的网络")
+                                default="测试蒸馏代码")
 
-    parser.add_argument('--train_yaml', type=str, default="train_depthwise_modulation.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_distillation.yaml")
 
     # system logger
     parser.add_argument('--logger', type=str,
-                  default="wandb", choices=['tensorboard', 'wandb','none'], help='system logger')
+                  default="none", choices=['tensorboard', 'wandb','none'], help='system logger')
 
     # # logs (does not to be changed in most time)
     # parser.add_argument('--dataloader_workers', type=int, default=6)
@@ -136,6 +138,81 @@ def createDirs(sys_state):
     
     sys_state["reporter_path"] = os.path.join(project_root,sys_state["version"]+"_report")
 
+def fetch_teacher_files(sys_state, env_config):
+
+    version = sys_state["teacher_model"]["version"]
+    if not os.path.exists(sys_state["log_root_path"]):
+        os.makedirs(sys_state["log_root_path"])
+    # create dirs                                     
+    sys_state["teacher_model"]["project_root"] = os.path.join(sys_state["log_root_path"], version)
+                                            
+    project_root = sys_state["teacher_model"]["project_root"]
+    if not os.path.exists(project_root):
+        os.makedirs(project_root)
+
+    sys_state["teacher_model"]["project_checkpoints"] = os.path.join(project_root, "checkpoints")
+    if not os.path.exists(sys_state["teacher_model"]["project_checkpoints"]):
+        os.makedirs(sys_state["teacher_model"]["project_checkpoints"])
+
+    sys_state["teacher_model"]["project_scripts"]     = os.path.join(project_root, "scripts")
+    if not os.path.exists(sys_state["teacher_model"]["project_scripts"]):
+        os.makedirs(sys_state["teacher_model"]["project_scripts"])
+    if sys_state["teacher_model"]["node_ip"] != "localhost":
+        from    utilities.sshupload import fileUploaderClass
+        machine_config = env_config["machine_config"]
+        machine_config = readConfig(machine_config)
+        nodeinf = None
+        for item in machine_config:
+            if item["ip"] == sys_state["teacher_model"]["node_ip"]:
+                nodeinf = item
+                break
+        if not nodeinf:
+            raise Exception(print("Configuration of node %s is unavaliable"%sys_state["node_ip"]))
+        print("ready to fetch related files from server: %s ......"%nodeinf["ip"])
+        uploader    = fileUploaderClass(nodeinf["ip"],nodeinf["user"],nodeinf["passwd"])
+
+        remotebase  = os.path.join(nodeinf['path'],"train_logs",version).replace('\\','/')
+        
+        # Get the config.json
+        print("ready to get the teacher's config.json...")
+        remoteFile  = os.path.join(remotebase, env_config["config_json_name"]).replace('\\','/')
+        localFile   = os.path.join(project_root, env_config["config_json_name"])
+        
+        ssh_state   = uploader.sshScpGet(remoteFile, localFile)
+        if not ssh_state:
+            raise Exception(print("Get file %s failed! config.json does not exist!"%remoteFile))
+        print("success get the teacher's config.json from server %s"%nodeinf['ip'])
+
+        # Get scripts
+        remoteDir   = os.path.join(remotebase, "scripts").replace('\\','/')
+        localDir    = os.path.join(sys_state["teacher_model"]["project_scripts"])
+        ssh_state   = uploader.sshScpGetDir(remoteDir, localDir)
+        if not ssh_state:
+            raise Exception(print("Get file %s failed! Program exists!"%remoteFile))
+        print("Get the teacher's scripts successful!")
+    # Read model_config.json
+    config_json = os.path.join(project_root, env_config["config_json_name"])
+    json_obj    = readConfig(config_json)
+    for item in json_obj.items():
+        if item[0] in ignoreKey:
+            pass
+        else:
+            sys_state["teacher_model"][item[0]] = item[1]
+        
+        # Get checkpoints
+    if sys_state["teacher_model"]["node_ip"] != "localhost":        
+        ckpt_name = "step%d_%s.pth"%(sys_state["teacher_model"]["checkpoint_step"],
+                                    sys_state["teacher_model"]["checkpoint_names"]["generator_name"])
+        localFile   = os.path.join(sys_state["teacher_model"]["project_checkpoints"],ckpt_name)
+        if not os.path.exists(localFile):
+            remoteFile  = os.path.join(remotebase, "checkpoints", ckpt_name).replace('\\','/')
+            ssh_state = uploader.sshScpGet(remoteFile, localFile, True)
+            if not ssh_state:
+                raise Exception(print("Get file %s failed! Checkpoint file does not exist!"%remoteFile))
+            print("Get the teacher's checkpoint %s successfully!"%(ckpt_name))
+        else:
+            print("%s exists!"%(ckpt_name))
+
 def main():
 
     config = getParameters()
@@ -213,7 +290,7 @@ def main():
         reporter = Reporter(sys_state["reporter_path"])
         sys_state["com_base"]       = "train_logs.%s.scripts."%sys_state["version"]
     
-        
+    fetch_teacher_files(sys_state,env_config)    
     # get the dataset path
     sys_state["dataset_paths"] = {}
     for data_key in env_config["dataset_paths"].keys():
@@ -234,6 +311,8 @@ def main():
     # print("GPUs:", gpus)
     print("\n========================================================================\n")
     print(sys_state)
+    for data_key in sys_state.keys():
+        print("[%s]---[%s]"%(data_key,sys_state[data_key]))
     print("\n========================================================================\n")
 
     

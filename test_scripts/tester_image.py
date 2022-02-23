@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 18th February 2022 5:00:28 pm
+# Last Modified:  Wednesday, 23rd February 2022 12:30:12 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -59,6 +59,17 @@ class Tester(object):
         # TODO replace below lines to define the model framework        
         self.network = gen_class(**model_config["g_model"]["module_params"])
         self.network = self.network.eval()
+        # for name in self.network.state_dict():
+        #     print(name)
+        self.features = {}
+        mapping_layers = [
+            "first_layer",
+            "down4",
+            "BottleNeck.2"
+        ]
+
+        
+
         # print and recorde model structure
         self.reporter.writeInfo("Model structure:")
         self.reporter.writeModel(self.network.__str__())

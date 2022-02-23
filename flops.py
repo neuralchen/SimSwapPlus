@@ -5,7 +5,7 @@
 # Created Date: Sunday February 13th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 17th February 2022 2:32:48 am
+# Last Modified:  Tuesday, 22nd February 2022 10:42:51 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     model_config={
         "id_dim": 512,
         "g_kernel_size": 3,
-        "in_channel":16,
+        "in_channel":32,
         "res_num": 9,
         # "up_mode": "nearest",
         "up_mode": "bilinear",

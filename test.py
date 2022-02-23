@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Saturday, 19th February 2022 11:46:06 am
+# Last Modified:  Sunday, 20th February 2022 4:13:22 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -34,7 +34,7 @@ def getParameters():
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=170000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=250000,
                                             help="checkpoint epoch for test phase or finetune phase")
 
     # test
