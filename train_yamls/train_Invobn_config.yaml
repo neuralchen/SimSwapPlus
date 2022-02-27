@@ -4,7 +4,7 @@ train_script_name: multi_gpu
 # models' scripts
 model_configs:
   g_model:
-    script: Generator_Invobn_config
+    script: Generator_Invobn_config3
     class_name: Generator
     module_params:
       id_dim: 512
