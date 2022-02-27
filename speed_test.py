@@ -5,7 +5,7 @@
 # Created Date: Thursday February 10th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Saturday, 19th February 2022 6:23:43 pm
+# Last Modified:  Saturday, 26th February 2022 4:13:24 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -21,8 +21,7 @@ if __name__ == '__main__':
     # cudnn.benchmark = True
     # cudnn.enabled   = True
     # script      = "Generator_modulation_up"
-    script      = "Generator_modulation_depthwise"
-    # script      = "Generator_modulation_depthwise_config"
+    script      = "Generator_Invobn_config1"
     # script      = "Generator_ori_config"
     class_name  = "Generator"
     arcface_ckpt= "arcface_ckpt/arcface_checkpoint.tar"
@@ -30,11 +29,10 @@ if __name__ == '__main__':
         "id_dim": 512,
         "g_kernel_size": 3,
         "in_channel":16,
-        "res_num": 9,
+        "res_num": 4,
         # "up_mode": "nearest",
         "up_mode": "bilinear",
-        "res_mode": "depthwise_eca",
-        "conv_mode": "depthwise_eca"
+        "res_mode": "depthwise"
     }
 
     os.environ['CUDA_VISIBLE_DEVICES'] = str(0)

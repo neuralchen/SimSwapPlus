@@ -5,7 +5,7 @@
 # Created Date: Sunday February 13th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 22nd February 2022 10:42:51 pm
+# Last Modified:  Sunday, 27th February 2022 6:30:55 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -20,20 +20,20 @@ from thop import clever_format
 
 
 if __name__ == '__main__':
-
+# 
    # script      = "Generator_modulation_up"
-    script      = "Generator_modulation_depthwise_config"
+    script      = "Generator_Invobn_config2"
     # script      = "Generator_ori_config"
     class_name  = "Generator"
     arcface_ckpt= "arcface_ckpt/arcface_checkpoint.tar"
     model_config={
         "id_dim": 512,
         "g_kernel_size": 3,
-        "in_channel":32,
-        "res_num": 9,
+        "in_channel":16,
+        "res_num": 6,
         # "up_mode": "nearest",
         "up_mode": "bilinear",
-        "res_mode": "depthwise"
+        "aggregator": "eca_invo"
     }
 
 

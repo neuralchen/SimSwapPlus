@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Wednesday, 23rd February 2022 12:42:54 am
+# Last Modified:  Sunday, 27th February 2022 12:12:19 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,7 +31,7 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='depthwise_config0',
+    parser.add_argument('-v', '--version', type=str, default='Invobn_eca1',
                                             help="version name for train, test, finetune")
     parser.add_argument('-t', '--tag', type=str, default='tiny',
                                             help="tag for current experiment")
@@ -46,9 +46,9 @@ def getParameters():
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="尝试直接训练最小规模的网络")
+                                default="尝试直接训练最小规模的网络,正往由ECA Invo构成")
 
-    parser.add_argument('--train_yaml', type=str, default="train_depthwise_modulation.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_Invobn_config.yaml")
 
     # system logger
     parser.add_argument('--logger', type=str,
