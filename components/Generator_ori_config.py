@@ -5,7 +5,7 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Wednesday, 16th February 2022 1:39:02 am
+# Last Modified:  Thursday, 3rd March 2022 6:09:43 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -106,8 +106,8 @@ class Generator(nn.Module):
         
         activation = nn.ReLU(True)
 
-        self.first_layer = nn.Sequential(nn.ReflectionPad2d(1), 
-                              nn.Conv2d(3, in_channel, kernel_size=3, padding=0, bias=False),
+        self.first_layer = nn.Sequential(nn.ReflectionPad2d(3), 
+                              nn.Conv2d(3, in_channel, kernel_size=7, padding=0, bias=False),
                                 nn.BatchNorm2d(in_channel), activation)
         ### downsample
         self.down1 = nn.Sequential(nn.Conv2d(in_channel, in_channel*2, kernel_size=3, stride=2, padding=1, bias=False),
@@ -119,8 +119,8 @@ class Generator(nn.Module):
         self.down3 = nn.Sequential(nn.Conv2d(in_channel*4, in_channel*8, kernel_size=3, stride=2, padding=1, bias=False),
                                 nn.BatchNorm2d(in_channel*8), activation)
 
-        self.down4 = nn.Sequential(nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, stride=2, padding=1, bias=False),
-                                nn.BatchNorm2d(in_channel*8), activation)
+        # self.down4 = nn.Sequential(nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, stride=2, padding=1, bias=False),
+        #                         nn.BatchNorm2d(in_channel*8), activation)
 
         ### resnet blocks
         BN = []
@@ -130,11 +130,11 @@ class Generator(nn.Module):
                         padding_type=padding_type, activation=activation)]
         self.BottleNeck = nn.Sequential(*BN)
 
-        self.up4 = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode='bilinear'),
-            nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, stride=1, padding=1, bias=False),
-            nn.BatchNorm2d(in_channel*8), activation
-        )
+        # self.up4 = nn.Sequential(
+        #     nn.Upsample(scale_factor=2, mode='bilinear'),
+        #     nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, stride=1, padding=1, bias=False),
+        #     nn.BatchNorm2d(in_channel*8), activation
+        # )
         
         self.up3 = nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear'),
@@ -153,8 +153,8 @@ class Generator(nn.Module):
             nn.Conv2d(in_channel*2, in_channel, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel), activation
         )
-        self.last_layer = nn.Sequential(nn.ReflectionPad2d(1),
-                    nn.Conv2d(in_channel, 3, kernel_size=3, padding=0))
+        self.last_layer = nn.Sequential(nn.ReflectionPad2d(3),
+                    nn.Conv2d(in_channel, 3, kernel_size=7, padding=0))
 
 
     #     self.__weights_init__()
@@ -174,12 +174,12 @@ class Generator(nn.Module):
         res = self.down1(res)
         res = self.down2(res)
         res = self.down3(res)
-        res = self.down4(res)
+        # res = self.down4(res)
 
         for i in range(len(self.BottleNeck)):
             res = self.BottleNeck[i](res, id)
 
-        res = self.up4(res)
+        # res = self.up4(res)
         res = self.up3(res)
         res = self.up2(res)
         res = self.up1(res)

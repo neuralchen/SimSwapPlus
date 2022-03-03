@@ -5,13 +5,14 @@
 # Created Date: Tuesday September 24th 2019
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 4th July 2021 11:50:12 pm
+# Last Modified:  Thursday, 3rd March 2022 8:42:13 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2019 Shanghai Jiao Tong University
 #############################################################
 
 import datetime
 import os
+import json
 
 class Reporter:
     def __init__(self,reportPath):
@@ -54,3 +55,8 @@ class Reporter:
             timeStr = datetime.datetime.strftime(datetime.datetime.now(),self.timeStrFormat)
             logf.writelines("[%d]-[%s]-[logInfo]-epoch[%d]-step[%d] %s\n"%(self.index,timeStr,epoch,step,logText))
             self.index += 1
+    
+    def writeJson(self, info):
+        with open(self.path, 'a+') as cf:
+            configjson  = json.dumps(info, indent=4)
+            cf.writelines(configjson)

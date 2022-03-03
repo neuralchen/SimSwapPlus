@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 20th February 2022 4:13:22 pm
+# Last Modified:  Thursday, 3rd March 2022 9:04:25 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -30,15 +30,17 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='depthwise_config0', # depthwise depthwise_config0
+    parser.add_argument('-v', '--version', type=str, default='Invobn_resinvo1', # depthwise depthwise_config0 Invobn_resinvo1
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=250000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=150000,
+                                            help="checkpoint epoch for test phase or finetune phase")
+    parser.add_argument('--start_checkpoint_step', type=int, default=10000,
                                             help="checkpoint epoch for test phase or finetune phase")
 
     # test
-    parser.add_argument('-t', '--test_script_name', type=str, default='image')
+    parser.add_argument('-t', '--test_script_name', type=str, default='image_allstep')
     parser.add_argument('-b', '--batch_size', type=int, default=1)
     parser.add_argument('-n', '--node_ip', type=str, default='101.33.242.26') # 101.33.242.26 2001:da8:8000:6880:f284:d61c:3c76:f9cb
     parser.add_argument('--crop_mode', type=str, default="vggface", choices=['ffhq','vggface'], help='crop mode for face detector')
@@ -193,6 +195,7 @@ def main():
                 break
         if not nodeinf:
             raise Exception(print("Configuration of node %s is unavaliable"%sys_state["node_ip"]))
+        sys_state["remote_machine"] = nodeinf
         print("ready to fetch related files from server: %s ......"%nodeinf["ip"])
         uploader    = fileUploaderClass(nodeinf["ip"],nodeinf["user"],nodeinf["passwd"])
 

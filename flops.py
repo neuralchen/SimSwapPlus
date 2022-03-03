@@ -5,7 +5,7 @@
 # Created Date: Sunday February 13th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 27th February 2022 8:15:11 pm
+# Last Modified:  Thursday, 3rd March 2022 6:15:37 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -34,7 +34,8 @@ if __name__ == '__main__':
         "res_num": 9,
         # "up_mode": "nearest",
         "up_mode": "bilinear",
-        "aggregator": "eca_invo"
+        "aggregator": "eca_invo",
+        "res_mode": "eca_invo"
     }
 
 

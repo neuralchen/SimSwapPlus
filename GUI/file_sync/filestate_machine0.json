@@ -60,7 +60,7 @@
     "face_crop.py": 1643789609.1834445,
     "face_crop_video.py": 1643815024.5516832,
     "similarity.py": 1643269705.1073737,
-    "train_multigpu.py": 1645935139.5672748,
+    "train_multigpu.py": 1646101637.160833,
     "components\\arcface_decoder.py": 1643396144.2575414,
     "components\\Generator_nobias.py": 1643179001.810856,
     "data_tools\\data_loader_VGGFace2HQ_multigpu.py": 1644861019.9044807,
@@ -111,7 +111,7 @@
     "components\\Generator_upsample.py": 1644689723.8293872,
     "components\\misc\\Involution.py": 1644509321.5267963,
     "train_yamls\\train_Invoup.yaml": 1644689981.9794765,
-    "flops.py": 1645883189.3803008,
+    "flops.py": 1646101039.8459642,
     "detection_test.py": 1644935512.6830947,
     "components\\DeConv_Depthwise.py": 1645064447.4379447,
     "components\\DeConv_Depthwise1.py": 1644946969.5054545,
@@ -140,5 +140,7 @@
     "components\\Generator_Invobn_config1.py": 1645862695.8743145,
     "components\\misc\\Involution_BN.py": 1645867197.3984175,
     "components\\misc\\Involution_ECA.py": 1645869012.4927464,
-    "train_yamls\\train_Invobn_config.yaml": 1645934993.5420852
+    "train_yamls\\train_Invobn_config.yaml": 1646101598.499709,
+    "components\\Generator_Invobn_config2.py": 1645962618.7056074,
+    "components\\Generator_Invobn_config3.py": 1646100847.8995547
 }

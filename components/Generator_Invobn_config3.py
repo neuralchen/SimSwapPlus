@@ -5,7 +5,7 @@
 # Created Date: Saturday February 26th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 27th February 2022 7:50:18 pm
+# Last Modified:  Thursday, 3rd March 2022 6:16:01 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -107,7 +107,7 @@ class ResnetBlock_Modulation(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        res_mode = "conv"
+        # res_mode = "conv"
         if res_mode.lower() == "conv":
             conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), Demodule()]
         elif res_mode.lower() == "depthwise":
@@ -158,13 +158,13 @@ class Generator(nn.Module):
         up_mode     = kwargs["up_mode"]
         
         aggregator  = kwargs["aggregator"]
-        res_mode    = aggregator
+        res_mode    = kwargs["res_mode"]
 
         padding_size= int((k_size -1)/2)
         padding_type= 'reflect'
         
         activation = nn.ReLU(True)
-
+        # from components.misc.Involution_BN import involution
         if aggregator == "invo":
             from components.misc.Involution_BN import involution
             from components.DeConv_Invobn import DeConv

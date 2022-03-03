@@ -5,7 +5,7 @@
 # Created Date: Thursday February 10th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Saturday, 26th February 2022 4:13:24 pm
+# Last Modified:  Thursday, 3rd March 2022 6:44:57 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -21,20 +21,22 @@ if __name__ == '__main__':
     # cudnn.benchmark = True
     # cudnn.enabled   = True
     # script      = "Generator_modulation_up"
-    script      = "Generator_Invobn_config1"
+    # script      = "Generator_modulation_up"
+    # script      = "Generator_Invobn_config3"
+    script      = "Generator_ori_config"
     # script      = "Generator_ori_config"
     class_name  = "Generator"
     arcface_ckpt= "arcface_ckpt/arcface_checkpoint.tar"
     model_config={
         "id_dim": 512,
         "g_kernel_size": 3,
-        "in_channel":16,
-        "res_num": 4,
+        "in_channel":64,
+        "res_num": 9,
         # "up_mode": "nearest",
         "up_mode": "bilinear",
-        "res_mode": "depthwise"
+        "aggregator": "eca_invo",
+        "res_mode": "eca_invo"
     }
-
     os.environ['CUDA_VISIBLE_DEVICES'] = str(0)
     print("GPU used : ", os.environ['CUDA_VISIBLE_DEVICES'])
 
@@ -55,7 +57,7 @@ if __name__ == '__main__':
     id_latent   = torch.rand((4,512)).cuda()
     # cv2.imwrite(os.path.join("./swap_results", "id_%s.png"%(id_basename)),id_img_align_crop[0]
 
-    attr        = torch.rand((4,3,512,512)).cuda()
+    attr        = torch.rand((4,3,224,224)).cuda()
     
     import datetime
     start_time  = time.time()
