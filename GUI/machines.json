@@ -17,4 +17,14 @@
         "ckp_path": "train_logs",
         "logfilename": "filestate_machine1.json"
     }
+    ,
+    {
+        "ip": "192.168.4.120",
+        "user": "gdp",
+        "port": 22,
+        "passwd": "glass123456",
+        "path": "/home/gdp/harddisk/Data2/simswap_plus",
+        "ckp_path": "train_logs",
+        "logfilename": "filestate_machine2.json"
+    }
 ]
