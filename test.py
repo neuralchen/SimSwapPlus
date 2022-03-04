@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 3rd March 2022 9:04:25 pm
+# Last Modified:  Friday, 4th March 2022 5:40:11 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -30,11 +30,11 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='Invobn_resinvo1', # depthwise depthwise_config0 Invobn_resinvo1
+    parser.add_argument('-v', '--version', type=str, default='ori_tiny', # depthwise depthwise_config0 Invobn_resinvo1
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=150000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=80000,
                                             help="checkpoint epoch for test phase or finetune phase")
     parser.add_argument('--start_checkpoint_step', type=int, default=10000,
                                             help="checkpoint epoch for test phase or finetune phase")
@@ -153,6 +153,7 @@ def main():
     # read system environment paths
     env_config = readConfig('env/env.json')
     env_config = env_config["path"]
+    sys_state["env_config"] = env_config
 
     # obtain all configurations in argparse
     config_dic = vars(config)

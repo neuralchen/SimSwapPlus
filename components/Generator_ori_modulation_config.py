@@ -5,26 +5,24 @@
 # Created Date: Sunday January 16th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 4th March 2022 1:41:59 am
+# Last Modified:  Friday, 4th March 2022 1:47:16 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
 
 import torch
 from torch import nn
-from components.DeConv_Invo import DeConv
 
-class InstanceNorm(nn.Module):
+class Demodule(nn.Module):
     def __init__(self, epsilon=1e-8):
         """
             @notice: avoid in-place ops.
             https://discuss.pytorch.org/t/encounter-the-runtimeerror-one-of-the-variables-needed-for-gradient-computation-has-been-modified-by-an-inplace-operation/836/3
         """
-        super(InstanceNorm, self).__init__()
+        super(Demodule, self).__init__()
         self.epsilon = epsilon
 
     def forward(self, x):
-        x   = x - torch.mean(x, (2, 3), True)
         tmp = torch.mul(x, x) # or x ** 2
         tmp = torch.rsqrt(torch.mean(tmp, (2, 3), True) + self.epsilon)
         return x * tmp
@@ -45,9 +43,22 @@ class ApplyStyle(nn.Module):
         x = x * (style[:, 0] * 1 + 1.) + style[:, 1] * 1
         return x
 
-class ResnetBlock_Adain(nn.Module):
-    def __init__(self, dim, latent_size, padding_type, activation=nn.ReLU(True)):
-        super(ResnetBlock_Adain, self).__init__()
+class Modulation(nn.Module):
+    def __init__(self, latent_size, channels):
+        super(Modulation, self).__init__()
+        self.linear = nn.Linear(latent_size, channels)
+
+    def forward(self, x, latent):
+        style = self.linear(latent)  # style => [batch_size, n_channels*2]
+        shape = [-1, x.size(1), 1, 1]
+        style = style.view(shape)    # [batch_size, 2, n_channels, ...]
+        #x = x * (style[:, 0] + 1.) + style[:, 1]
+        x = x * style
+        return x
+
+class ResnetBlock_Modulation(nn.Module):
+    def __init__(self, dim, latent_size, padding_type, activation=nn.ReLU(True),res_mode="depthwise"):
+        super(ResnetBlock_Modulation, self).__init__()
 
         p = 0
         conv1 = []
@@ -59,9 +70,9 @@ class ResnetBlock_Adain(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p), InstanceNorm()]
+        conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p), Demodule()]
         self.conv1 = nn.Sequential(*conv1)
-        self.style1 = ApplyStyle(latent_size, dim)
+        self.style1 = Modulation(latent_size, dim)
         self.act1 = activation
 
         p = 0
@@ -74,17 +85,21 @@ class ResnetBlock_Adain(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), InstanceNorm()]
+        # res_mode = "conv"
+        conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), Demodule()]
+        
         self.conv2 = nn.Sequential(*conv2)
-        self.style2 = ApplyStyle(latent_size, dim)
+        self.style2 = Modulation(latent_size, dim)
 
 
     def forward(self, x, dlatents_in_slice):
-        y = self.conv1(x)
-        y = self.style1(y, dlatents_in_slice)
+        y = self.style1(x, dlatents_in_slice)
+        y = self.conv1(y)
+        
         y = self.act1(y)
-        y = self.conv2(y)
         y = self.style2(y, dlatents_in_slice)
+        y = self.conv2(y)
+        
         out = x + y
         return out
 
@@ -126,7 +141,7 @@ class Generator(nn.Module):
         BN = []
         for _ in range(res_num):
             BN += [
-                ResnetBlock_Adain(in_channel*8, latent_size=id_dim,
+                ResnetBlock_Modulation(in_channel*8, latent_size=id_dim,
                         padding_type=padding_type, activation=activation)]
         self.BottleNeck = nn.Sequential(*BN)
 
