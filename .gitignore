@@ -134,3 +134,4 @@ parsing_model/
 *.rar
 *.zip
 *.tar
+*.pth
