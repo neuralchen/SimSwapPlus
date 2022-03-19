@@ -167,8 +167,8 @@ class PatchNCELoss(nn.Module):
 
     def forward(self, feat_q, feat_k):
         num_patches = feat_q.shape[0]
-        dim = feat_q.shape[1]
-        feat_k = feat_k.detach()
+        dim         = feat_q.shape[1]
+        feat_k      = feat_k.detach()
 
         # pos logit
         l_pos = torch.bmm(

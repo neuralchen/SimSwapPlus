@@ -1,10 +1,10 @@
 # Related scripts
-train_script_name: cycleloss
+train_script_name: multi_gpu_cycle
 
 # models' scripts
 model_configs:
   g_model:
-    script: Generator
+    script: Generator_LSTU_config
     class_name: Generator
     module_params:
       g_conv_dim: 512
@@ -22,10 +22,10 @@ model_configs:
 arcface_ckpt: arcface_ckpt/arcface_checkpoint.tar
 
 # Training information
-batch_size: 12
+batch_size: 24
 
 # Dataset
-dataloader: VGGFace2HQ
+dataloader: VGGFace2HQ_multigpu
 dataset_name: vggface2_hq
 dataset_params:
   random_seed: 1234
@@ -40,18 +40,19 @@ eval_batch_size: 2
 # Optimizer
 optim_type: Adam
 g_optim_config:
-  lr:  0.0004
+  lr:  0.0006
   betas: [ 0, 0.99]
   eps: !!float 1e-8
 
 d_optim_config:
-  lr:  0.0004
+  lr:  0.0006
   betas: [ 0, 0.99]
   eps: !!float 1e-8
 
 id_weight: 20.0
-reconstruct_weight: 0.1
-feature_match_weight: 0.1
+reconstruct_weight: 10.0
+rec_feature_match_weight: 10.0
+cycle_feature_match_weight: 10.0
 cycle_weight: 10.0
 
 # Log 
