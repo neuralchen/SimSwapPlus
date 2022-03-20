@@ -1,3 +1,3 @@
 
 
-nohup python train_multigpu.py > depthwise_config0.log 2>&1 &
+nohup python train_multigpu.py > cycle_lstu1.log 2>&1 &

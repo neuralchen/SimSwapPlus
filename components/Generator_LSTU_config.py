@@ -13,7 +13,7 @@
 
 import torch
 from torch import nn
-from LSTU import LSTU
+from components.LSTU import LSTU
 
 # from components.DeConv_Invo import DeConv
 class InstanceNorm(nn.Module):
@@ -48,7 +48,12 @@ class ApplyStyle(nn.Module):
         return x
 
 class ResnetBlock_Adain(nn.Module):
-    def __init__(self, dim, latent_size, padding_type, activation=nn.ReLU(True)):
+    def __init__(self, 
+                dim,
+                latent_size,
+                padding_type,
+                activation=nn.ReLU(True),
+                res_mode="depthwise"):
         super(ResnetBlock_Adain, self).__init__()
 
         p = 0
@@ -61,7 +66,16 @@ class ResnetBlock_Adain(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding = p), InstanceNorm()]
+        if res_mode.lower() == "conv":
+            conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), InstanceNorm()]
+        elif res_mode.lower() == "depthwise":
+            conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1),
+                InstanceNorm()]
+        elif res_mode.lower() == "depthwise_eca":
+            conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1),
+                InstanceNorm()]
         self.conv1 = nn.Sequential(*conv1)
         self.style1 = ApplyStyle(latent_size, dim)
         self.act1 = activation
@@ -76,7 +90,16 @@ class ResnetBlock_Adain(nn.Module):
             p = 1
         else:
             raise NotImplementedError('padding [%s] is not implemented' % padding_type)
-        conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), InstanceNorm()]
+        if res_mode.lower() == "conv":
+            conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), InstanceNorm()]
+        elif res_mode.lower() == "depthwise":
+            conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1),
+                InstanceNorm()]
+        elif res_mode.lower() == "depthwise_eca":
+            conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1),
+                InstanceNorm()]
         self.conv2 = nn.Sequential(*conv2)
         self.style2 = ApplyStyle(latent_size, dim)
 
@@ -104,7 +127,7 @@ class Generator(nn.Module):
         up_mode     = kwargs["up_mode"]
         
         aggregator  = kwargs["aggregator"]
-        res_mode    = aggregator
+        res_mode    = kwargs["res_mode"]
 
         padding_size= int((k_size -1)/2)
         padding_type= 'reflect'
@@ -122,28 +145,24 @@ class Generator(nn.Module):
         #                         nn.BatchNorm2d(64), activation)
         ### downsample
         self.down1 = nn.Sequential(
-                                nn.Conv2d(in_channel, in_channel, kernel_size=3, padding=1, groups=in_channel),
-                                nn.Conv2d(in_channel, in_channel*2, kernel_size=1, bias=False),
+                                nn.Conv2d(in_channel, in_channel*2, stride=2, kernel_size=3, padding=1, bias=False),
                                 nn.BatchNorm2d(in_channel*2),
                                 activation)
                                 
         self.down2 = nn.Sequential(
-                                nn.Conv2d(in_channel*2, in_channel*2, kernel_size=3, padding=1, groups=in_channel*2),
-                                nn.Conv2d(in_channel*2, in_channel*4, kernel_size=1, bias=False),
+                                nn.Conv2d(in_channel*2, in_channel*4, stride=2, kernel_size=3, padding=1, bias=False),
                                 nn.BatchNorm2d(in_channel*4),
                                 activation)
 
-        self.lstu  = LSTU(in_channel*4,in_channel*4,in_channel*8,4)
+        # self.lstu  = LSTU(in_channel*4,in_channel*4,in_channel*8,4)
 
         self.down3 = nn.Sequential(
-                                nn.Conv2d(in_channel*4, in_channel*4, kernel_size=3, padding=1, groups=in_channel*4),
-                                nn.Conv2d(in_channel*4, in_channel*8, kernel_size=1, bias=False),
+                                nn.Conv2d(in_channel*4, in_channel*8, stride=2, kernel_size=3, padding=1, bias=False),
                                 nn.BatchNorm2d(in_channel*8),
                                 activation)
 
         self.down4 = nn.Sequential(
-                                nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, padding=1, groups=in_channel*8),
-                                nn.Conv2d(in_channel*8, in_channel*8, kernel_size=1, bias=False),
+                                nn.Conv2d(in_channel*8, in_channel*8, stride=2, kernel_size=3, padding=1, bias=False),
                                 nn.BatchNorm2d(in_channel*8),
                                 activation)
         
@@ -158,25 +177,29 @@ class Generator(nn.Module):
         self.BottleNeck = nn.Sequential(*BN)
 
         self.up4 = nn.Sequential(
-            DeConv(in_channel*8,in_channel*8,3,up_mode=up_mode),
+            nn.Upsample(scale_factor=2, mode='bilinear'),
+            nn.Conv2d(in_channel*8, in_channel*8, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel*8),
             activation
         )
         
         self.up3 = nn.Sequential(
-            DeConv(in_channel*8,in_channel*4,3,up_mode=up_mode),
+            nn.Upsample(scale_factor=2, mode='bilinear'),
+            nn.Conv2d(in_channel*8, in_channel*4, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel*4),
             activation
         )
         
         self.up2 = nn.Sequential(
-            DeConv(in_channel*4,in_channel*2,3,up_mode=up_mode),
+            nn.Upsample(scale_factor=2, mode='bilinear'),
+            nn.Conv2d(in_channel*4, in_channel*2, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel*2),
             activation
         )
 
         self.up1 = nn.Sequential(
-            DeConv(in_channel*2,in_channel,3,up_mode=up_mode),
+            nn.Upsample(scale_factor=2, mode='bilinear'),
+            nn.Conv2d(in_channel*2, in_channel, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(in_channel),
             activation
         )
@@ -201,17 +224,16 @@ class Generator(nn.Module):
     def forward(self, img, id):
         res = self.first_layer(img)
         res = self.down1(res)
-        res1 = self.down2(res)
-        res = self.down3(res1)
+        res = self.down2(res)
+        res = self.down3(res)
         res = self.down4(res)
 
         for i in range(len(self.BottleNeck)):
             res = self.BottleNeck[i](res, id)
-
+        # skip = self.lstu(res1, res)
         res = self.up4(res)
         res = self.up3(res)
-        skip = self.lstu(res1)
-        res = self.up2(res + skip)
+        res = self.up2(res) #  + skip
         res = self.up1(res)
         res = self.last_layer(res)
 

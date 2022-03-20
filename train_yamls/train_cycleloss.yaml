@@ -7,9 +7,13 @@ model_configs:
     script: Generator_LSTU_config
     class_name: Generator
     module_params:
-      g_conv_dim: 512
+      id_dim: 512
       g_kernel_size: 3
+      in_channel: 64
       res_num: 9
+      up_mode: bilinear
+      aggregator: "conv"
+      res_mode: "conv"
 
   d_model:
     script: projected_discriminator
@@ -19,17 +23,18 @@ model_configs:
       interp224: False
       backbone_kwargs: {}
 
+# arcface_ckpt: arcface_torch/checkpoints/glint360k_cosface_r100_fp16_backbone.pth
 arcface_ckpt: arcface_ckpt/arcface_checkpoint.tar
 
 # Training information
-batch_size: 24
+batch_size: 20
 
 # Dataset
 dataloader: VGGFace2HQ_multigpu
 dataset_name: vggface2_hq
 dataset_params:
   random_seed: 1234
-  dataloader_workers: 8
+  dataloader_workers: 6
 
 eval_dataloader: DIV2K_hdf5
 eval_dataset_name: DF2K_H5_Eval

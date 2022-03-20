@@ -24,7 +24,7 @@ class LSTU(nn.Module):
                 ):
         super().__init__()
         sig              = nn.Sigmoid()
-        self.relu        = nn.Relu()
+        self.relu        = nn.ReLU(True)
 
         self.up_sample   = nn.Sequential(nn.ConvTranspose2d(latent_channel, out_channel, kernel_size=4, stride=scale, padding=0, bias=False),
                                 nn.BatchNorm2d(out_channel), sig)
