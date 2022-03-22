@@ -48,7 +48,7 @@ def getParameters():
 
     parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\gxt3.jpeg')
     # parser.add_argument('-i', '--id_imgs', type=str, default='G:\\VGGFace2-HQ\\VGGface2_ffhq_align_256_9_28_512_bygfpgan\\n000002\\0027_01.jpg')
-    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\ID',
+    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\FF++',
                                                 help="file path for attribute images or video")
     
     parser.add_argument('--use_specified_data', action='store_true')
