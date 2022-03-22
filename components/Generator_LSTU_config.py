@@ -113,6 +113,8 @@ class ResnetBlock_Adain(nn.Module):
         out = x + y
         return out
 
+
+
 class Generator(nn.Module):
     def __init__(
                 self,

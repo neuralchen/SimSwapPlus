@@ -31,7 +31,7 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='cycle_lstu1',
+    parser.add_argument('-v', '--version', type=str, default='cycle_res1',
                                             help="version name for train, test, finetune")
     parser.add_argument('-t', '--tag', type=str, default='cycle',
                                             help="tag for current experiment")
@@ -46,9 +46,9 @@ def getParameters():
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="cycle配合LSTU")
+                                default="cycle配合残差decoder,ID注入放在decoder中")
 
-    parser.add_argument('--train_yaml', type=str, default="train_cycleloss.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_cycleloss_res.yaml")
 
     # system logger
     parser.add_argument('--logger', type=str,
