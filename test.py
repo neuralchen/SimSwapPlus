@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 4th March 2022 5:40:11 pm
+# Last Modified:  Thursday, 24th March 2022 12:14:59 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -30,25 +30,25 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='ori_tiny', # depthwise depthwise_config0 Invobn_resinvo1
+    parser.add_argument('-v', '--version', type=str, default='cycle_lstu1', #cycle_res1 cycle_lstu1 depthwise depthwise_config0 Invobn_resinvo1
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=80000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=40000,
                                             help="checkpoint epoch for test phase or finetune phase")
     parser.add_argument('--start_checkpoint_step', type=int, default=10000,
                                             help="checkpoint epoch for test phase or finetune phase")
 
     # test
-    parser.add_argument('-t', '--test_script_name', type=str, default='image_allstep')
+    parser.add_argument('-t', '--test_script_name', type=str, default='image')
     parser.add_argument('-b', '--batch_size', type=int, default=1)
     parser.add_argument('-n', '--node_ip', type=str, default='101.33.242.26') # 101.33.242.26 2001:da8:8000:6880:f284:d61c:3c76:f9cb
     parser.add_argument('--crop_mode', type=str, default="vggface", choices=['ffhq','vggface'], help='crop mode for face detector')
 
 
-    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\gxt3.jpeg')
+    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\hinton.jpg')
     # parser.add_argument('-i', '--id_imgs', type=str, default='G:\\VGGFace2-HQ\\VGGface2_ffhq_align_256_9_28_512_bygfpgan\\n000002\\0027_01.jpg')
-    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\FF++',
+    parser.add_argument('-a', '--attr_files', type=str, default='G:\\swap_data\\ID\\bengio.jpeg',
                                                 help="file path for attribute images or video")
     
     parser.add_argument('--use_specified_data', action='store_true')
