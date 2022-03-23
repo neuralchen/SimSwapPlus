@@ -1,6 +1,6 @@
 {
     "GUI.py": 1647657822.9152665,
-    "test.py": 1647657822.945273,
+    "test.py": 1647879709.2723496,
     "train.py": 1647657822.9562755,
     "components\\Generator.py": 1647657822.93127,
     "components\\projected_discriminator.py": 1647657822.938272,
@@ -60,7 +60,7 @@
     "face_crop.py": 1647657822.9422722,
     "face_crop_video.py": 1647657822.9422722,
     "similarity.py": 1647657822.945273,
-    "train_multigpu.py": 1647700474.445049,
+    "train_multigpu.py": 1647967698.603863,
     "components\\arcface_decoder.py": 1647657822.9352713,
     "components\\Generator_nobias.py": 1643179001.810856,
     "data_tools\\data_loader_VGGFace2HQ_multigpu.py": 1647657822.9402719,
@@ -186,5 +186,7 @@
     "train_scripts\\trainer_distillation_mgpu_withrec_importweight.py": 1647657822.9592762,
     "train_scripts\\trainer_multi_gpu_CUT.py": 1647676964.475,
     "train_scripts\\trainer_multi_gpu_cycle.py": 1647705628.7020626,
-    "components\\Generator_LSTU_config.py": 1647704615.1532204
+    "components\\Generator_LSTU_config.py": 1647954099.1135788,
+    "components\\Generator_Res_config.py": 1648006159.4385264,
+    "train_yamls\\train_cycleloss_res.yaml": 1648006232.5734456
 }

@@ -27,7 +27,7 @@ model_configs:
 arcface_ckpt: arcface_ckpt/arcface_checkpoint.tar
 
 # Training information
-batch_size: 20
+batch_size: 18
 
 # Dataset
 dataloader: VGGFace2HQ_multigpu

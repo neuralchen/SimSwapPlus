@@ -51,65 +51,57 @@ class ResnetBlock_Adain(nn.Module):
     def __init__(self, 
                 dim,
                 latent_size,
-                padding_type,
-                activation=nn.ReLU(True),
+                activation=nn.LeakyReLU(0.2),
                 res_mode="depthwise"):
         super(ResnetBlock_Adain, self).__init__()
 
-        p = 0
         conv1 = []
-        if padding_type == 'reflect':
-            conv1 += [nn.ReflectionPad2d(1)]
-        elif padding_type == 'replicate':
-            conv1 += [nn.ReplicationPad2d(1)]
-        elif padding_type == 'zero':
-            p = 1
-        else:
-            raise NotImplementedError('padding [%s] is not implemented' % padding_type)
+        self.in1 = InstanceNorm()
+        self.in2 = InstanceNorm()
         if res_mode.lower() == "conv":
-            conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), InstanceNorm()]
+            
+            conv1 += [activation, 
+                nn.Conv2d(dim, dim, kernel_size=3, padding=1, bias=False)]
+
         elif res_mode.lower() == "depthwise":
-            conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
-                nn.Conv2d(dim, dim, kernel_size=1),
-                InstanceNorm()]
+            conv1 += [activation,
+                nn.Conv2d(dim, dim, kernel_size=3, padding=1,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1)]
+
         elif res_mode.lower() == "depthwise_eca":
-            conv1 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
-                nn.Conv2d(dim, dim, kernel_size=1),
-                InstanceNorm()]
+            conv1 += [activation,
+                nn.Conv2d(dim, dim, kernel_size=3, padding=1,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1)]
+
         self.conv1 = nn.Sequential(*conv1)
         self.style1 = ApplyStyle(latent_size, dim)
-        self.act1 = activation
 
-        p = 0
         conv2 = []
-        if padding_type == 'reflect':
-            conv2 += [nn.ReflectionPad2d(1)]
-        elif padding_type == 'replicate':
-            conv2 += [nn.ReplicationPad2d(1)]
-        elif padding_type == 'zero':
-            p = 1
-        else:
-            raise NotImplementedError('padding [%s] is not implemented' % padding_type)
         if res_mode.lower() == "conv":
-            conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p), InstanceNorm()]
+            conv2 += [activation, 
+                nn.Conv2d(dim, dim, kernel_size=3, padding=1, bias=False)]
+
         elif res_mode.lower() == "depthwise":
-            conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
-                nn.Conv2d(dim, dim, kernel_size=1),
-                InstanceNorm()]
+            conv2 += [activation,
+                nn.Conv2d(dim, dim, kernel_size=3, padding=1,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1)]
+
         elif res_mode.lower() == "depthwise_eca":
-            conv2 += [nn.Conv2d(dim, dim, kernel_size=3, padding=p,groups=dim, bias=False),
-                nn.Conv2d(dim, dim, kernel_size=1),
-                InstanceNorm()]
+            conv2 += [activation,
+                nn.Conv2d(dim, dim, kernel_size=3, padding=1,groups=dim, bias=False),
+                nn.Conv2d(dim, dim, kernel_size=1)]
         self.conv2 = nn.Sequential(*conv2)
         self.style2 = ApplyStyle(latent_size, dim)
 
 
     def forward(self, x, dlatents_in_slice):
-        y = self.conv1(x)
+        y = self.in1(x)
         y = self.style1(y, dlatents_in_slice)
-        y = self.act1(y)
-        y = self.conv2(y)
+        y = self.conv1(y)
+        y = self.in2(y)
         y = self.style2(y, dlatents_in_slice)
+        y = self.conv2(y)
+
         out = x + y
         return out
 
@@ -302,12 +294,11 @@ class Generator(nn.Module):
         
 
         ### resnet blocks
-        # BN = []
-        # for i in range(res_num):
-        #     BN += [
-        #         ResnetBlock_Adain(in_channel*8, latent_size=id_dim, 
-        #                 padding_type=padding_type, activation=activation, res_mode=res_mode)]
-        # self.BottleNeck = nn.Sequential(*BN)
+        BN = []
+        for i in range(res_num):
+            BN += [
+                ResnetBlock_Adain(in_channel*8, latent_size=id_dim,res_mode=res_mode)]
+        self.BottleNeck = nn.Sequential(*BN)
 
         self.up4 = ResUpSampleBlock(in_channel*8,in_channel*8,id_dim,res_mode=res_mode) # 64
         # nn.Sequential(
@@ -363,6 +354,8 @@ class Generator(nn.Module):
         res = self.down1(res)
         res = self.down2(res)
         res = self.down3(res)
+        for i in range(len(self.BottleNeck)):
+            res = self.BottleNeck[i](res, id)
         res = self.up4(res,id)
         res = self.up3(res,id)
         res = self.up2(res,id) #  + skip
