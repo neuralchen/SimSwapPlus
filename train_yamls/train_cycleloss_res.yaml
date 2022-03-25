@@ -4,13 +4,13 @@ train_script_name: multi_gpu_cycle
 # models' scripts
 model_configs:
   g_model:
-    script: Generator_Res_config
+    script: Generator_Res_config2
     class_name: Generator
     module_params:
       id_dim: 512
       g_kernel_size: 3
       in_channel: 64
-      res_num: 9
+      res_num: 3
       up_mode: bilinear
       aggregator: "conv"
       res_mode: "conv"
@@ -27,7 +27,7 @@ model_configs:
 arcface_ckpt: arcface_ckpt/arcface_checkpoint.tar
 
 # Training information
-batch_size: 18
+batch_size: 8
 
 # Dataset
 dataloader: VGGFace2HQ_multigpu
@@ -45,12 +45,12 @@ eval_batch_size: 2
 # Optimizer
 optim_type: Adam
 g_optim_config:
-  lr:  0.0006
+  lr:  0.0004
   betas: [ 0, 0.99]
   eps: !!float 1e-8
 
 d_optim_config:
-  lr:  0.0006
+  lr:  0.0004
   betas: [ 0, 0.99]
   eps: !!float 1e-8
 

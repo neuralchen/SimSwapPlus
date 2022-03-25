@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 4th March 2022 1:53:03 am
+# Last Modified:  Thursday, 24th March 2022 2:14:07 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,7 +31,7 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='cycle_res1',
+    parser.add_argument('-v', '--version', type=str, default='cycle_res3',
                                             help="version name for train, test, finetune")
     parser.add_argument('-t', '--tag', type=str, default='cycle',
                                             help="tag for current experiment")
@@ -40,13 +40,13 @@ def getParameters():
                                             choices=['train', 'finetune','debug'],
                                                 help="The phase of current project")
 
-    parser.add_argument('-c', '--gpus', type=int, nargs='+', default=[0,1]) # <0 if it is set as -1, program will use CPU
+    parser.add_argument('-c', '--gpus', type=int, nargs='+', default=[0,1,2,3]) # <0 if it is set as -1, program will use CPU
     parser.add_argument('-e', '--ckpt', type=int, default=74,
                                 help="checkpoint epoch for test phase or finetune phase")
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="cycle配合残差decoder,ID注入放在decoder中")
+                                default="cycle配合残差decoder,改用starganv2的generator结构")
 
     parser.add_argument('--train_yaml', type=str, default="train_cycleloss_res.yaml")
 

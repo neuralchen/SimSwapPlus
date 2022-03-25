@@ -1,0 +1,17 @@
+G:/swap_data/ID/hsw.jpg;G:/swap_data/ID/cruise.jpg;fusion
+G:/swap_data/ID/06.jpg;G:/swap_data/ID/hm.jpg;fusion
+G:/swap_data/ID/1.png;G:/swap_data/ID/2.png;fusion
+G:/swap_data/ID/hinton.jpg;G:/swap_data/ID/bengio.jpg;fusion
+G:/swap_data/ID/hsw.jpg;G:/swap_data/ID/ts1.jpg;fusion
+G:/swap_data/ID/hsw.jpg;G:/swap_data/ID/lyf2.jpeg;fusion
+G:/swap_data/FF++/996_img_00288.jpg;G:/swap_data/FF++/056_img_00228.jpg;no
+G:/swap_data/ID/gxt3.jpeg;G:/swap_data/ID/lyf5.jpeg;fusion
+G:/swap_data/ID/hsw.jpg;G:/swap_data/ID/hb.jpeg;fusion
+G:/swap_data/ID/06.jpg;G:/swap_data/ID/cruise2.jpeg;fusion
+G:/swap_data/FF++/019_img_00139.jpg;G:/swap_data/FF++/018_img_00088.jpg;no
+G:/swap_data/FF++/052_img_00033.jpg;G:/swap_data/FF++/108_img_00150.jpg;no
+G:/swap_data/FF++/011_img_00448.jpg;G:/swap_data/FF++/805_img_00252.jpg;no
+G:/swap_data/FF++/638_img_00000.jpg;G:/swap_data/FF++/640_img_00248.jpg;no
+G:/swap_data/FF++/819_img_00651.jpg;G:/swap_data/FF++/786_img_00156.jpg;no
+G:/swap_data/FF++/416_img_00032.jpg;G:/swap_data/FF++/342_img_00062.jpg;no
+G:/swap_data/ID/hsw.jpg;G:/swap_data/ID/lyf4.jpeg;fusion
