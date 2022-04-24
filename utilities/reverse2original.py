@@ -86,7 +86,7 @@ def reverse2wholeimage(b_align_crop_tenor_list,swaped_imgs, mats, crop_size, ori
     # print(mats)
     # print(len(b_align_crop_tenor_list))
     for swaped_img, mat ,source_img in zip(swaped_imgs, mats,b_align_crop_tenor_list):
-        swaped_img = swaped_img.cpu().detach().numpy().transpose((1, 2, 0))
+        swaped_img = swaped_img.cpu().numpy().transpose((1, 2, 0))
         img_white = np.full((crop_size,crop_size), 255, dtype=float)
 
         # inverse the Affine transformation matrix

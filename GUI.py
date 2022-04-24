@@ -5,14 +5,17 @@
 # Created Date: Wednesday December 22nd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 17th February 2022 10:47:35 pm
+# Last Modified:  Friday, 22nd April 2022 11:23:17 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
 
 
 
+from glob import glob
+from ipaddress import ip_address
 import os
+import re
 import sys
 import time
 import json
@@ -37,6 +40,7 @@ import tkinter.ttk as ttk
 
 import subprocess
 from pathlib import Path
+from tkinter.filedialog import askopenfilename
 
 
 
@@ -143,6 +147,27 @@ class fileUploaderClass(object):
         return roots
     
     def sshScpGetRNames(self,remoteDir):
+        self.__ssh__.connect(self.__ip__, self.__port__ , self.__userName__, self.__passWd__)
+        sftp = paramiko.SFTPClient.from_transport(self.__ssh__.get_transport())
+        sftp = self.__ssh__.open_sftp()
+        wocao = sftp.listdir(remoteDir)
+        # print(wocao.st_mtime)
+        roots = {}
+        for item in wocao:
+            wocao = sftp.stat(remoteDir+"/"+item)
+            roots[item] = {
+                "t":wocao.st_mtime,
+                "p":remoteDir+"/"+item
+            }
+            # temp= remoteDir+ "/"+item
+            # child_dirs = sftp.listdir(temp)
+            # child_dirs = ["save\\" +item + "\\" + i for i in child_dirs]
+            # list_name += child_dirs
+        sftp.close()
+        self.__ssh__.close()
+        return roots
+    
+    def sshScpGetRNamesBySuffix(self, remoteDir, suffix):
         self.__ssh__.connect(self.__ip__, self.__port__ , self.__userName__, self.__passWd__)
         sftp = paramiko.SFTPClient.from_transport(self.__ssh__.get_transport())
         sftp = self.__ssh__.open_sftp()
@@ -308,16 +333,16 @@ class Application(tk.Frame):
         "config_json_name":"model_config.json"
     }
     machine_text = {
-                "ip": "0.0.0.0",
+                "ip": "localhost",
                 "user": "username",
                 "port": 22,
                 "passwd": "12345678",
-                "path": "/path/to/remote_host",
+                "path": ".",
                 "ckp_path":"save",
-                "logfilename": "filestate_machine0.json"
+                "logfilename": "filestate_machine_localhost.json"
     }
     current_log = {}
-
+    current_ckpt = {}
 
     def __init__(self, master=None):
         tk.Frame.__init__(self, master,bg='black')
@@ -435,7 +460,7 @@ class Application(tk.Frame):
         config_frame.pack(fill="both", padx=5,pady=5)
         config_frame.columnconfigure(0, weight=1)
         config_frame.columnconfigure(1, weight=1)
-        # config_frame.columnconfigure(2, weight=1)
+        config_frame.columnconfigure(2, weight=1)
 
         machine_btn     = tk.Button(config_frame, text = "Ignore Conf",
                             font=font_list, command = self.IgnoreConfig, bg='#660099', fg='#F5F5F5')
@@ -445,12 +470,17 @@ class Application(tk.Frame):
                             font=font_list, command = self.EnvConfig, bg='#660099', fg='#F5F5F5')
         machine_btn2.grid(row=0,column=1,sticky=tk.EW)
 
+        machine_btn2 = tk.Button(config_frame, text = "Test Conf",
+                            font=font_list, command = self.TestConfig, bg='#660099', fg='#F5F5F5')
+        machine_btn2.grid(row=0,column=2,sticky=tk.EW)
+
         #################################################################################################
         log_frame    = tk.Frame(self.master)
         log_frame.pack(fill="both", padx=5,pady=5)
         log_frame.columnconfigure(0, weight=1)
         log_frame.columnconfigure(1, weight=1)
         log_frame.columnconfigure(2, weight=1)
+        log_frame.columnconfigure(3, weight=1)
 
         self.log_var = tkinter.StringVar()
 
@@ -460,14 +490,22 @@ class Application(tk.Frame):
             self.update_ckpt_task()
         self.log_com.bind("<<ComboboxSelected>>",select_log)
         
+        self.test_var = tkinter.StringVar()
+
+        self.test_com = ttk.Combobox(log_frame, textvariable=self.test_var)
+        self.test_com.grid(row=0,column=1,sticky=tk.EW)
 
         log_update_button = tk.Button(log_frame, text = "Fresh",
                             font=font_list, command = self.UpdateLog, bg='#F4A460', fg='#F5F5F5')
-        log_update_button.grid(row=0,column=1,sticky=tk.EW)
-
-        log_update_button = tk.Button(log_frame, text = "Pull Log",
-                            font=font_list, command = self.PullLog, bg='#F4A460', fg='#F5F5F5')
         log_update_button.grid(row=0,column=2,sticky=tk.EW)
+
+        # log_update_button = tk.Button(log_frame, text = "Pull Log",
+        #                     font=font_list, command = self.PullLog, bg='#F4A460', fg='#F5F5F5')
+        # log_update_button.grid(row=0,column=2,sticky=tk.EW)
+
+        log_update_button = tk.Button(log_frame, text = "Fresh CKPT",
+                            font=font_list, command = self.UpdateCKPT, bg='#F4A460', fg='#F5F5F5')
+        log_update_button.grid(row=0,column=3,sticky=tk.EW)
 
         #################################################################################################
         test_frame    = tk.Frame(self.master)
@@ -475,20 +513,80 @@ class Application(tk.Frame):
         test_frame.columnconfigure(0, weight=1)
         test_frame.columnconfigure(1, weight=1)
         test_frame.columnconfigure(2, weight=1)
+        # test_frame.columnconfigure(3, weight=1)
 
-        self.test_var = tkinter.StringVar()
+        self.testscript_var = tkinter.StringVar()
 
-        self.test_com = ttk.Combobox(test_frame, textvariable=self.test_var)
-        self.test_com.grid(row=0,column=0,sticky=tk.EW)
-        
+        self.testscript_com = ttk.Combobox(test_frame, textvariable=self.testscript_var)
+        self.testscript_com.grid(row=0,column=0,sticky=tk.EW)
 
-        test_update_button = tk.Button(test_frame, text = "Fresh CKPT",
-                            font=font_list, command = self.UpdateCKPT, bg='#F4A460', fg='#F5F5F5')
-        test_update_button.grid(row=0,column=1,sticky=tk.EW)
+        testscript_files = Path("./test_scripts").glob("*.py")
+        testscript_list  = []
+        for item in testscript_files:
+            basename = item.name
+            basename = os.path.splitext(basename)[0]
+            testscript_list.append(basename)
+        self.testscript_com["value"] = testscript_list
+
+        # test_update_button = tk.Button(test_frame, text = "Fresh CKPT",
+        #                     font=font_list, command = self.UpdateCKPT, bg='#F4A460', fg='#F5F5F5')
+        # test_update_button.grid(row=0,column=1,sticky=tk.EW)
 
         test_update_button = tk.Button(test_frame, text = "Test",
                             font=font_list, command = self.Test, bg='#F4A460', fg='#F5F5F5')
+        test_update_button.grid(row=0,column=1,sticky=tk.EW)
+
+        # test_update_button = tk.Button(test_frame, text = "Test Config",
+        #                     font=font_list, command = self.TestConfig, bg='#660099', fg='#F5F5F5')
+        # test_update_button.grid(row=0,column=2,sticky=tk.EW)
+
+        test_update_button = tk.Button(test_frame, text = "Sample",
+                            font=font_list, command = self.OpenSample, bg='#0033FF', fg='#F5F5F5')
         test_update_button.grid(row=0,column=2,sticky=tk.EW)
+
+        # #################################################################################################
+
+        select_frame    = tk.Frame(self.master)
+        select_frame.pack(fill="both", padx=5,pady=5)
+       
+        select_frame.columnconfigure(0, weight=2)
+        select_frame.columnconfigure(1, weight=5)
+        select_frame.columnconfigure(2, weight=1)
+        select_frame.columnconfigure(3, weight=2)
+        select_frame.columnconfigure(4, weight=5)
+        select_frame.columnconfigure(5, weight=1)
+        select_frame.columnconfigure(6, weight=3)
+
+        self.preprocess_var = tkinter.StringVar()
+
+        self.preprocess_com = ttk.Combobox(select_frame, textvariable=self.preprocess_var)
+        self.preprocess_com.grid(row=0,column=6,sticky=tk.EW)
+        self.preprocess_com["value"] = ["True", "False"]
+        self.preprocess_com.current(1)
+        self.ID_path = tkinter.StringVar()
+        self.ID_path.set("...")
+        tk.Label(select_frame, text="ID:",font=font_list,justify="left")\
+                    .grid(row=0,column=0,sticky=tk.EW)
+        
+        tk.Entry(select_frame, textvariable= self.ID_path, font=font_list)\
+                    .grid(row=0,column=1,sticky=tk.EW)
+        
+        tk.Button(select_frame, text = "...", font=font_list,
+                    command = self.Select_ID_path, bg='#F4A460', fg='#F5F5F5')\
+                    .grid(row=0,column=2,sticky=tk.EW)
+
+
+        self.Attr_path = tkinter.StringVar()
+        self.Attr_path.set("...")
+        tk.Label(select_frame, text="Attr:",font=font_list,justify="left")\
+                    .grid(row=0,column=3,sticky=tk.EW)
+        
+        tk.Entry(select_frame, textvariable= self.Attr_path, font=font_list)\
+                    .grid(row=0,column=4,sticky=tk.EW)
+        
+        tk.Button(select_frame, text = "...", font=font_list,
+                    command = self.Select_Attr_path, bg='#F4A460', fg='#F5F5F5')\
+                    .grid(row=0,column=5,sticky=tk.EW)
 
 
         # #################################################################################################
@@ -527,23 +625,61 @@ class Application(tk.Frame):
 
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
     
-    # def __scaning_logs__(self):
+
+    def Select_ID_path(self):
+        thread_update = threading.Thread(target=self.select_ID_task)
+        thread_update.start()
+    
+    def select_ID_task(self):
+        path = askopenfilename()
+        print("Selected ID: %s"%path)
+        self.ID_path.set(path)
+    
+    def Select_Attr_path(self):
+        thread_update = threading.Thread(target=self.select_Attr_task)
+        thread_update.start()
+    
+    def select_Attr_task(self):
+        path = askopenfilename()
+        print("Selected Attibutes: %s"%path)
+        self.Attr_path.set(path)
+
     def UpdateCKPT(self):
         thread_update = threading.Thread(target=self.update_ckpt_task)
         thread_update.start()
-    
+
     def update_ckpt_task(self):
-        ip          = self.list_com.get()
-        log         = self.log_com.get()
-        cur_mac     = self.machine_dict[ip]
-        files = Path('.',cur_mac["ckp_path"], log)
-        files = files.glob('*.pth')
-        all_files   = []
-        for one_file in files:
-            all_files.append(one_file.name)
-        self.test_com["value"] =all_files
-        if len(all_files):
+        print("Loading checkpoints..........................")
+        remotemachine, mac  = self.connection()
+        log                 = self.log_com.get()
+        remote_path         = os.path.join(mac["path"],mac["ckp_path"], log, "checkpoints").replace("\\", "/")
+        
+        if remotemachine == []:
+            files = Path(remote_path).glob("*/")
+            first_level   = {}
+            for one_file in files:
+                first_level[one_file.name] = {
+                "t":"",
+                "p":""
+                }
+        else:
+            first_level = remotemachine.sshScpGetNames(remote_path)
+        
+        if len(first_level) == 0:
+            self.test_com["value"] = [""]
             self.test_com.current(0)
+            print("No checkpoint found!")
+            return
+        logs = []
+        for k,v in first_level.items():
+            logs.append([k,v["t"]])
+        # logs = sorted(logs)
+        logs = sorted(logs, key= lambda logs : logs[1],reverse=True)
+        self.test_com["value"] =[item[0] for item in logs]
+        
+        self.test_com.current(0)
+        self.current_ckpt = first_level
+        print("Checkpoints list update success!")
     
     def CopyPasswd(self):
         def copy():
@@ -557,13 +693,25 @@ class Application(tk.Frame):
     
     def Test(self):
         def test_task():
+            ip          = self.list_com.get()
             log         = self.log_com.get()
             ckpt        = self.test_com.get()
+            script_name = self.testscript_com.get()
+            id_path     = self.ID_path.get()
+            attr_path   = self.Attr_path.get()
+            preprocess  = self.preprocess_com.get()
+            # if preprocess == "Preprocess-Off":
+            #     preprocess = "off"
+            # else:
+            #     preprocess = "on"
+            ckpt        = re.sub("\D", "", ckpt)
             cwd         = os.getcwd()
-            files = str(Path(log, ckpt))
-            print(files)
+            # files = str(Path(log, ckpt))
+            # print(files)
+            print("start cmd /k \"cd /d %s && conda activate base \
+                && python test.py -v %s -s %s -t %s -n %s -i %s -a %s --preprocess %s \""%(cwd, log, ckpt, script_name, ip, id_path, attr_path, preprocess))
             subprocess.check_call("start cmd /k \"cd /d %s && conda activate base \
-                && python test.py --model %s\""%(cwd, files), shell=True)
+                && python test.py -v %s -s %s -t %s -n %s --preprocess %s -i %s -a %s\""%(cwd, log, ckpt, script_name, ip, preprocess , id_path, attr_path), shell=True)
         thread_update = threading.Thread(target=test_task)
         thread_update.start()
     
@@ -595,7 +743,7 @@ class Application(tk.Frame):
         ssh_username    = cur_mac["user"]
         ssh_passwd      = cur_mac["passwd"]
         ssh_port        = int(cur_mac["port"])
-        print(ssh_ip)
+        print("Processing IP: %s."%ssh_ip)
         if ip.lower() == "local" or ip.lower() == "localhost":
             print("localhost no need to connect!")
             return [], cur_mac
@@ -607,6 +755,7 @@ class Application(tk.Frame):
         print(cells)
     
     def update_log_task(self):
+        print("Processing! Do not touch!")
         remotemachine,mac = self.connection()
         remote_path = os.path.join(mac["path"],mac["ckp_path"]).replace("\\", "/")
         if remotemachine == []:
@@ -617,16 +766,23 @@ class Application(tk.Frame):
                 "t":"",
                 "p":""
                 }
+        # elif remotemachine == "localhost":
+
         else:
             first_level = remotemachine.sshScpGetNames(remote_path)
+        if len(first_level) == 0:
+            print("No training log found!")
+            return
         logs = []
         for k,v in first_level.items():
-            logs.append(k)
-        logs = sorted(logs)
-        self.log_com["value"] =logs
+            logs.append([k,v["t"]])
+        # logs = sorted(logs)
+        logs = sorted(logs, key= lambda logs : logs[1],reverse=True)
+        self.log_com["value"] = [item[0] for item in logs]
         self.log_com.current(0)
         self.current_log = first_level
         self.update_ckpt_task()
+        print("Done!")
 
     def UpdateLog(self):
         thread_update = threading.Thread(target=self.update_log_task)
@@ -666,6 +822,21 @@ class Application(tk.Frame):
             
         thread_update = threading.Thread(target=pull_log_task)
         thread_update.start()
+    
+    def TestConfig(self):
+        def test_config_task():
+            subprocess.call("start %s"%"test.py", shell=True)
+        thread_update = threading.Thread(target=test_config_task)
+        thread_update.start()
+    
+    def OpenSample(self):
+        def open_cmd_task():
+            log     = self.log_com.get()
+            cwd     = os.getcwd()
+            sample  = os.path.join(cwd,"test_logs",log,"samples")
+            subprocess.call("explorer "+sample, shell=False)
+        thread_update = threading.Thread(target=open_cmd_task)
+        thread_update.start()
         
     def OpenCMD(self):
         def open_cmd_task():
@@ -685,6 +856,7 @@ class Application(tk.Frame):
             ip              = self.list_com.get()
             if ip.lower() == "local" or ip.lower() == "localhost":
                 print("localhost no need to connect!")
+                return
             cur_mac         = self.machine_dict[ip]
             ssh_ip          = cur_mac["ip"]
             ssh_username    = cur_mac["user"]
@@ -707,6 +879,10 @@ class Application(tk.Frame):
     def GPUUsage(self):
         def gpu_usage_task():
             remotemachine,_ = self.connection()
+            if remotemachine == "local" or remotemachine == "localhost":
+                print("localhost no need to connect!")
+                return
+
             results         = remotemachine.sshExec("nvidia-smi")
             print(results)
             

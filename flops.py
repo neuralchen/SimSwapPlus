@@ -5,7 +5,7 @@
 # Created Date: Sunday February 13th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 4th March 2022 1:53:53 am
+# Last Modified:  Monday, 18th April 2022 10:52:57 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -22,7 +22,7 @@ from thop import clever_format
 if __name__ == '__main__':
 # 
     # script      = "Generator_modulation_up"
-    script      = "Generator_Invobn_config3"
+    script      = "Generator_2mask"
     # script      = "Generator_ori_modulation_config"
     # script      = "Generator_ori_config"
     class_name  = "Generator"
@@ -30,12 +30,13 @@ if __name__ == '__main__':
     model_config={
         "id_dim": 512,
         "g_kernel_size": 3,
-        "in_channel":16,
-        "res_num": 9,
+        "in_channel":64,
+        "res_num": 3,
         # "up_mode": "nearest",
         "up_mode": "bilinear",
         "aggregator": "eca_invo",
-        "res_mode": "conv"
+        "res_mode": "conv",
+        "norm": "bn"
     }
 
 

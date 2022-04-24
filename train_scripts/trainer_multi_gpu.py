@@ -5,7 +5,7 @@
 # Created Date: Sunday January 9th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 17th March 2022 1:01:52 am
+# Last Modified:  Saturday, 26th March 2022 4:58:52 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -433,9 +433,6 @@ def train_loop(
         if rank == 0 and (step + 1) % log_freq == 0:
             elapsed = time.time() - start_time
             elapsed = str(datetime.timedelta(seconds=elapsed))
-            # print("ready to report losses")
-            # ID_Total= loss_G_ID
-            # torch.distributed.all_reduce(ID_Total)
             
             epochinformation="[{}], Elapsed [{}], Step [{}/{}], \
                     G_ID: {:.4f}, G_loss: {:.4f}, Rec_loss: {:.4f}, Fm_loss: {:.4f}, \

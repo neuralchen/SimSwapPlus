@@ -5,7 +5,7 @@
 # Created Date: Saturday February 26th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Sunday, 27th February 2022 11:03:58 am
+# Last Modified:  Wednesday, 30th March 2022 11:36:20 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -33,7 +33,7 @@ def str2bool(v):
 def getParameters():
     parser = argparse.ArgumentParser()
     # general
-    parser.add_argument('--image_dir', type=str, default="G:\\VGGFace2-HQ\\VGGface2_None_norm_512_true_bygfpgan")
+    parser.add_argument('--image_dir', type=str, default="G:/VGGFace2-HQ/VGGface2_None_norm_512_true_bygfpgan")
     parser.add_argument('--savetxt', type=str, default="./check_list.txt")
     parser.add_argument('--winWidth', type=int, default=512)
     parser.add_argument('--winHeight', type=int, default=512)

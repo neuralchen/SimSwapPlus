@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 21st January 2022 11:06:37 am
+# Last Modified:  Friday, 22nd April 2022 11:20:19 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -33,6 +33,8 @@ from utilities.ImagenetNorm import ImagenetNorm
 from parsing_model.model import BiSeNet
 from insightface_func.face_detect_crop_single import Face_detect_crop
 from utilities.reverse2original import reverse2wholeimage
+from face_enhancer.gfpgan import GFPGANer
+from utilities.utilities import load_file_from_url
 
 class Tester(object):
     def __init__(self, config, reporter):
@@ -64,6 +66,7 @@ class Tester(object):
     def video_swap(
         self,
         video_path,
+        gfpgan,
         id_vetor,
         save_path,
         temp_results_dir='./temp_results',
@@ -121,8 +124,11 @@ class Tester(object):
                     swap_result_list = []
                     frame_align_crop_tenor_list = []
                     for frame_align_crop in frame_align_crop_list:
+                        if gfpgan:
+                            _, _, frame_align_crop = gfpgan.enhance(
+                                frame_align_crop, has_aligned=False, only_center_face=True, paste_back=True)
                         frame_align_crop_tenor = self.cv2totensor(frame_align_crop)
-                        swap_result = self.network(frame_align_crop_tenor, id_vetor)[0]
+                        swap_result = self.network(frame_align_crop_tenor, id_vetor)[0][0]
                         swap_result = swap_result* self.imagenet_std + self.imagenet_mean
                         swap_result = torch.clip(swap_result,0.0,1.0)
                         cv2.imwrite(os.path.join(temp_results_dir, 'frame_{:0>7d}.jpg'.format(frame_index)), frame)
@@ -216,6 +222,39 @@ class Tester(object):
         # models
         self.__init_framework__()
 
+        if self.config["preprocess"]:
+            print("Employ GFPGAN to upsampling detected face images!")
+            version = '1.2'
+            if version == '1':
+                arch = 'original'
+                channel_multiplier = 1
+                model_name = 'GFPGANv1'
+            elif version == '1.2':
+                arch = 'clean'
+                channel_multiplier = 2
+                model_name = 'GFPGANCleanv1-NoCE-C2'
+            elif version == '1.3':
+                arch = 'clean'
+                channel_multiplier = 2
+                model_name = 'GFPGANv1.3'
+
+            # determine model paths
+            model_path = os.path.join('./face_enhancer/experiments/pretrained_models', model_name + '.pth')
+            url_path   = "https://github.com/TencentARC/GFPGAN/releases/download/v0.2.0/GFPGANCleanv1-NoCE-C2.pth"
+            if not os.path.isfile(model_path):
+                # raise ValueError(f'Model {model_name} does not exist.')
+                print(f'Model {model_name} does not exist. Prepare to download it......')
+                model_path = load_file_from_url(
+                    url=url_path, model_dir=model_path, progress=True, file_name=None)
+            restorer = GFPGANer(
+                model_path=model_path,
+                upscale=1,
+                arch=arch,
+                channel_multiplier=channel_multiplier,
+                bg_upsampler=None)
+        else:
+            restorer = None
+
         
 
         mode        = None
@@ -239,7 +278,7 @@ class Tester(object):
         start_time = time.time()
         self.network.eval()
         with torch.no_grad():
-            self.video_swap(attr_files, latend_id, save_dir, temp_results_dir="./.temples",\
+            self.video_swap(attr_files, restorer, latend_id, save_dir, temp_results_dir="./.temples",\
                 use_mask=False,crop_size=512)
                                             
         elapsed = time.time() - start_time

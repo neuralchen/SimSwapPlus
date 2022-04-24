@@ -1,6 +1,7 @@
 # Simswap++
 
 ## Dependencies
+- moviepy
 - python >= 3.7
 - yaml (pip install pyyaml)
 - paramiko (For ssh file transportation)

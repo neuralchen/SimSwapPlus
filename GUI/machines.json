@@ -9,6 +9,15 @@
         "logfilename": "filestate_machine0.json"
     },
     {
+        "ip": "119.29.91.52",
+        "user": "ubuntu",
+        "port": 22,
+        "passwd": "zpKlOW0sMlyt!xhE",
+        "path": "/home/ubuntu/CXH/simswap_plus",
+        "ckp_path": "train_logs",
+        "logfilename": "filestate_machine3.json"
+    },
+    {
         "ip": "2001:da8:8000:6880:f284:d61c:3c76:f9cb",
         "user": "ps",
         "port": 22,

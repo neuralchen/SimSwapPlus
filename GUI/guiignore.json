@@ -2,7 +2,8 @@
     "white_list": {
         "extension": [
             "py",
-            "yaml"
+            "yaml",
+            "txt"
         ],
         "file": [],
         "path": []

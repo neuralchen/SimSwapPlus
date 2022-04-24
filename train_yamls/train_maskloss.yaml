@@ -1,0 +1,75 @@
+# Related scripts
+train_script_name: mgpu_maskloss
+
+# models' scripts
+model_configs:
+  g_model:
+    script: Generator_maskhead_config
+    class_name: Generator
+    module_params:
+      id_dim: 512
+      g_kernel_size: 3
+      in_channel: 64
+      res_num: 3
+      up_mode: bilinear
+      aggregator: "conv"
+      res_mode: "conv"
+      norm: "bn"
+
+  d_model:
+    script: Nonstau_Discriminator_FM
+    class_name: Discriminator
+    module_params:
+      img_size: 512
+      max_conv_dim: 512
+      norm: "bn"
+
+# arcface_ckpt: arcface_torch/checkpoints/glint360k_cosface_r100_fp16_backbone.pth
+arcface_ckpt: arcface_ckpt/arcface_checkpoint.tar
+
+# Training information
+batch_size: 16
+
+# Dataset
+dataloader: VGGFace2HQ_multigpu_w_mask
+dataset_name: vggface2_hq
+dataset_params:
+  random_seed: 1234
+  dataloader_workers: 6
+
+eval_dataloader: DIV2K_hdf5
+eval_dataset_name: DF2K_H5_Eval
+eval_batch_size: 2
+
+# Dataset
+
+# Optimizer
+optim_type: Adam
+g_optim_config:
+  lr:  0.0006
+  betas: [ 0, 0.99]
+  eps: !!float 1e-8
+
+d_optim_config:
+  lr:  0.0006
+  betas: [ 0, 0.99]
+  eps: !!float 1e-8
+
+
+d_reg_freq: 16
+id_weight: 30.0
+reconstruct_weight: 1.0
+rec_feature_match_weight: 1.0
+cycle_feature_match_weight: 1.0
+cycle_weight: 1.0
+reg_weight: 8.0
+mask_weight: 10.0
+
+# Log 
+log_step: 500
+model_save_step: 10000
+total_step: 1000000
+sample_step: 1000
+checkpoint_names:
+  generator_name: Generator
+  discriminator_name: Discriminator

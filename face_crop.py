@@ -5,7 +5,7 @@
 # Created Date: Tuesday February 1st 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Wednesday, 2nd February 2022 4:13:28 pm
+# Last Modified:  Sunday, 24th April 2022 2:01:47 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -25,6 +25,8 @@ import tkinter.ttk as ttk
 
 import subprocess
 from pathlib import Path
+
+import numpy as np
 
 from insightface_func.face_detect_crop_multi import Face_detect_crop
 
@@ -113,6 +115,7 @@ class Application(tk.Frame):
         label_frame.columnconfigure(0, weight=1)
         label_frame.columnconfigure(1, weight=1)
         label_frame.columnconfigure(2, weight=1)
+        label_frame.columnconfigure(3, weight=1)
 
         tk.Label(label_frame, text="Crop Size:",font=font_list,justify="left")\
                     .grid(row=0,column=0,sticky=tk.EW)
@@ -122,6 +125,9 @@ class Application(tk.Frame):
 
         tk.Label(label_frame, text="Target Format:",font=font_list,justify="left")\
                     .grid(row=0,column=2,sticky=tk.EW)
+        
+        tk.Label(label_frame, text="Blurry Thredhold:",font=font_list,justify="left")\
+                    .grid(row=0,column=3,sticky=tk.EW)
         
         #################################################################################################
 
@@ -151,8 +157,10 @@ class Application(tk.Frame):
         self.format_com["value"] = ["png","jpg"]
         self.format_com.current(0)
 
-        
-
+        self.thredhold = tkinter.StringVar()
+        tk.Entry(test_frame, textvariable= self.thredhold, font=font_list)\
+                    .grid(row=0,column=3,sticky=tk.EW)
+        self.thredhold.set("70")
         #################################################################################################
         scale_frame    = tk.Frame(self.master)
         scale_frame.pack(fill="both", padx=5,pady=5)
@@ -200,8 +208,10 @@ class Application(tk.Frame):
     
     def select_task(self):
         path = askdirectory()
-        print("Selected source directory: %s"%path)
-        self.img_path.set(path)
+        
+        if os.path.isdir(path):
+            print("Selected source directory: %s"%path)
+            self.img_path.set(path)
     
     def Select_Target(self):
         thread_update = threading.Thread(target=self.select_target_task)
@@ -209,8 +219,9 @@ class Application(tk.Frame):
     
     def select_target_task(self):
         path = askdirectory()
-        print("Selected target directory: %s"%path)
-        self.save_path.set(path)
+        if os.path.isdir(path):
+            print("Selected target directory: %s"%path)
+            self.save_path.set(path)
     
     def Crop(self):
         thread_update = threading.Thread(target=self.crop_task)
@@ -218,39 +229,59 @@ class Application(tk.Frame):
     
     def crop_task(self):
         mode        = self.align_com.get()
+        if mode == "VGGFace":
+            mode = "None"
         crop_size   = int(self.test_com.get())
         
         path        = self.img_path.get()
         tg_path     = self.save_path.get()
+        blur_t      = self.thredhold.get()
+        basepath    = os.path.splitext(os.path.basename(path))[0]
+        tg_path     = os.path.join("H:/face_data/VGGFace2_HQ",basepath)
+        print("target path: ",tg_path)
+        if not os.path.exists(tg_path):
+            os.makedirs(tg_path)
         tg_format   = self.format_com.get()
         min_scale   = float(self.min_scale.get())
-        blur_t      = 100.0
-        font        = cv2.FONT_HERSHEY_SIMPLEX 
+        blur_t      = float(blur_t)
+        print("Blurry thredhold %f"%blur_t)
         self.detect.prepare(ctx_id = 0, det_thresh=0.6,\
                         det_size=(640,640),mode = mode,crop_size=crop_size,ratio=min_scale)
+        log_file = "./dataset_readme.txt"
+        with open(log_file,'a+') as logf: # ,encoding='UTF-8'
+                    logf.writelines("%s --> %s\n"%(path,tg_path))
         if path and tg_path:
             imgs_list = []
             if os.path.isdir(path):
                 print("Input a dir....")
-                imgs = glob.glob(os.path.join(path,"*"))
-                for item in imgs:
+                # imgs = glob.glob(os.path.join(path,"**"))
+                for item in glob.iglob(os.path.join(path,"**"),recursive=True):
                     imgs_list.append(item)
                 # print(imgs_list)
                 index = 0
                 for img in imgs_list:
                     print(img)
-                    attr_img_ori= cv2.imread(img)
+                    try:
+                        attr_img_ori = cv2.imdecode(np.fromfile(img, dtype=np.uint8),-1)
+                    except:
+                        print("Illegal file!")
+                        continue
+                    # attr_img_ori= cv2.imread(img)
                     try:
                         attr_img_align_crop, _ = self.detect.get(attr_img_ori)
                         sub_index = 0
+                        if len(attr_img_align_crop) < 1:
+                            print("Small face")
                         for face_i in attr_img_align_crop:
                             imageVar = cv2.Laplacian(face_i, cv2.CV_64F).var()
                             f_path =os.path.join(tg_path, str(index).zfill(6)+"_%d.%s"%(sub_index,tg_format))
+                            # print("save path: ",f_path)
                             if imageVar < blur_t:
                                 print("Over blurry image!")
                                 continue
                             # face_i = cv2.putText(face_i, '%.1f'%imageVar,(50, 50), font, 0.8, (15, 9, 255), 2)
-                            cv2.imwrite(f_path,face_i)
+                            # cv2.imwrite(f_path,face_i)
+                            cv2.imencode('.png',face_i)[1].tofile(f_path)
                             sub_index += 1
                         index += 1
                     except:

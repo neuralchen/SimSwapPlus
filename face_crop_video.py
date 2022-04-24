@@ -5,7 +5,7 @@
 # Created Date: Tuesday February 1st 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Wednesday, 2nd February 2022 11:17:04 pm
+# Last Modified:  Friday, 15th April 2022 10:07:15 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -27,7 +27,7 @@ def getParameters():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--save_path', type=str, default="./output/",
                                             help="The root path for saving cropped images")
-    parser.add_argument('-v', '--video', type=str, default="G:\\4K\\05.mp4",
+    parser.add_argument('-v', '--video', type=str, default="G:\\4K\\Faith.Makes.Great.2021\\40.mp4",
                                             help="The path for input video")                                        
     parser.add_argument('-c', '--crop_size', type=int, default=512,
                                             help="expected image resolution")
@@ -39,7 +39,7 @@ def getParameters():
                                             choices=['jpg', 'png'],help="target file format")
     parser.add_argument('-i', '--interval', type=int, default=20,
                                             help="number of frames interval")
-    parser.add_argument('-b', '--blur', type=float, default=10.0,
+    parser.add_argument('-b', '--blur', type=float, default=20.0,
                                             help="blur degree")
     return parser.parse_args()
 

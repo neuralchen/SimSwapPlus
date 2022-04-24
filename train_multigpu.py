@@ -5,7 +5,7 @@
 # Created Date: Tuesday April 28th 2020
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Thursday, 24th March 2022 2:14:07 pm
+# Last Modified:  Tuesday, 19th April 2022 6:58:59 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2020 Shanghai Jiao Tong University
 #############################################################
@@ -31,9 +31,9 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='cycle_res3',
+    parser.add_argument('-v', '--version', type=str, default='2maskloss256_1',
                                             help="version name for train, test, finetune")
-    parser.add_argument('-t', '--tag', type=str, default='cycle',
+    parser.add_argument('-t', '--tag', type=str, default='256',
                                             help="tag for current experiment")
 
     parser.add_argument('-p', '--phase', type=str, default="train",
@@ -41,14 +41,16 @@ def getParameters():
                                                 help="The phase of current project")
 
     parser.add_argument('-c', '--gpus', type=int, nargs='+', default=[0,1,2,3]) # <0 if it is set as -1, program will use CPU
-    parser.add_argument('-e', '--ckpt', type=int, default=74,
+    parser.add_argument('-e', '--ckpt', type=int, default=10000,
                                 help="checkpoint epoch for test phase or finetune phase")
 
     # training
     parser.add_argument('--experiment_description', type=str,
-                                default="cycle配合残差decoder,改用starganv2的generator结构")
+                                default="使用了一个128*128的mask以及256*256的mask,mask loss调整到100使得mask能比较完整,另外我始终认为mask head应该从encoder的输出引出,如果从decoder引出显然逻辑上\\\
+                                    就有很大的问题,因为这个时候mask与decoder共用同一个feature,那么如果被ID改变后的feature脸型发生了较大的改变,岂不是mask也会跟着变,mask应该反映的是encoder输入的target image的\\\
+                                    mask,那么是否应该使用encoder的信息呢.此前从enc中引head去生成mask会生成空洞较大的mask,增大weight应该是可以改善这个问题吧,将生成器最后的两层改回adain注入")
 
-    parser.add_argument('--train_yaml', type=str, default="train_cycleloss_res.yaml")
+    parser.add_argument('--train_yaml', type=str, default="train_2maskhead_256.yaml")
 
     # system logger
     parser.add_argument('--logger', type=str,

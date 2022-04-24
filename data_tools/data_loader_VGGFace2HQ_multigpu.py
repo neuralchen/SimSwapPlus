@@ -5,7 +5,7 @@
 # Created Date: Sunday February 6th 2022
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Tuesday, 15th February 2022 1:50:19 am
+# Last Modified:  Wednesday, 6th April 2022 12:53:53 am
 # Modified By: Chen Xuanhong
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
@@ -108,7 +108,7 @@ class VGGFace2HQDataset(data.Dataset):
                     subffix='jpg',
                     random_seed=1234):
         """Initialize and preprocess the VGGFace2 HQ dataset."""
-        self.image_dir      = image_dir
+        self.image_dir      = image_dir["images"]
         self.img_transform  = img_transform   
         self.subffix        = subffix
         self.dataset        = []

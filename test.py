@@ -5,7 +5,7 @@
 # Created Date: Saturday July 3rd 2021
 # Author: Chen Xuanhong
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 25th March 2022 6:13:32 pm
+# Last Modified:  Saturday, 23rd April 2022 10:03:56 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2021 Shanghai Jiao Tong University
 #############################################################
@@ -32,33 +32,39 @@ def getParameters():
     
     parser = argparse.ArgumentParser()
     # general settings
-    parser.add_argument('-v', '--version', type=str, default='cycle_res1', #cycle_res1 cycle_res2 cycle_res3 cycle_lstu1 depthwise depthwise_config0 Invobn_resinvo1
+    parser.add_argument('-v', '--version', type=str, default='maskhead_recfm_2', # maskhead_recfm_2 maskloss_2 resskip_recfm_1 maskhead_recfm_1 maskhead_recfm_2 resskip_2 resskip_3 resskip_4 resskip_9 cycle_res1 cycle_res2 cycle_res3 cycle_lstu1 depthwise depthwise_config0 Invobn_resinvo1
                                             help="version name for train, test, finetune")
 
     parser.add_argument('-c', '--cuda', type=int, default=0) # >0 if it is set as -1, program will use CPU
-    parser.add_argument('-s', '--checkpoint_step', type=int, default=180000,
+    parser.add_argument('-s', '--checkpoint_step', type=int, default=480000,
                                             help="checkpoint epoch for test phase or finetune phase")
     parser.add_argument('--start_checkpoint_step', type=int, default=10000,
                                             help="checkpoint epoch for test phase or finetune phase")
 
     # test
-    parser.add_argument('-t', '--test_script_name', type=str, default='image_list')  #image_list image_nofusion
+    parser.add_argument('-t', '--test_script_name', type=str, default='tester_video')  # video image_w_mask image_list_w_mask image_list image_nofusion
     parser.add_argument('-b', '--batch_size', type=int, default=1)
-    parser.add_argument('-n', '--node_ip', type=str, default='101.33.242.26') # 101.33.242.26 2001:da8:8000:6880:f284:d61c:3c76:f9cb
+    parser.add_argument('-n', '--node_ip', type=str, default='localhost') # localhost 119.29.91.52 101.33.242.26 2001:da8:8000:6880:f284:d61c:3c76:f9cb
     parser.add_argument('--crop_mode', type=str, default="vggface", choices=['ffhq','vggface'], help='crop mode for face detector')
 
 
-    parser.add_argument('-i', '--id_imgs', type=str, default='G:\\swap_data\\ID\\dlrb2.jpeg') # 'G:\\swap_data\\FF++\\996_img_00288.jpg' G:\\swap_data\\ID\\hinton.jpg
+    parser.add_argument('-i', '--id_imgs', type=str, default='G:/simswap/inputdata/2/2/10.jpg') # G:/simswap/inputdata/2/2/10.jpg G:\\swap_data\\ID\\dlrb2.jpeg 'G:\\swap_data\\FF++\\996_img_00288.jpg' G:\\swap_data\\ID\\hinton.jpg
     # parser.add_argument('-i', '--id_imgs', type=str, default='G:\\VGGFace2-HQ\\VGGface2_ffhq_align_256_9_28_512_bygfpgan\\n000002\\0027_01.jpg')
-    parser.add_argument('-a', '--attr_files', type=str, default='G:/swap_data/video/1', # G:\\swap_data\\ID\\bengio.jpg G:\\swap_data\\FF++\\056_img_00228.jpg
-                                                help="file path for attribute images or video")
+    parser.add_argument('-a', '--attr_files', type=str, default='G:/simswap/inputdata/3/100297.mp4', # G:/swap_data/video/1 G:\\swap_data\\ID\\bengio.jpg G:\\swap_data\\FF++\\056_img_00228.jpg
+                                                help="file path for attribute images or video") # G:/swap_data/video/2/G2218_Trim.mp4
     parser.add_argument('--img_list_txt', type=str, default='./test_imgs_list.txt', # G:\\swap_data\\ID\\bengio.jpg G:\\swap_data\\FF++\\056_img_00228.jpg
                                                 help="file path for image list txt")
-    
+    parser.add_argument('--record_metric', type=str2bool, default='False',
+                                                help="Whether to record the cosine similarity")
+    parser.add_argument('--save_mask', type=str2bool, default='False',
+                                                help="Whether to save the mask")
+
+    parser.add_argument('--preprocess', type=str2bool, default='False', help='Whether to employ preprocess')
+
     parser.add_argument('--use_specified_data', action='store_true')
     parser.add_argument('--specified_data_paths', type=str, nargs='+', default=[""], help='paths to specified files')
-    parser.add_argument('--use_specified_data_paths', type=str2bool, default='True', choices=['True', 'False'], help='use the specified save dir')
-    parser.add_argument('--specified_save_path', type=str, default="", help='save results to specified dir')
+    parser.add_argument('--use_specified_data_paths', type=str2bool, default='False', help='use the specified save dir')
+    parser.add_argument('--specified_save_path', type=str, default="G:/swap_data/video/results3", help='save results to specified dir')
     
     # # logs (does not to be changed in most time)
     # parser.add_argument('--dataloader_workers', type=int, default=6)
@@ -266,7 +272,7 @@ def main():
     
     # Display the test information
     # TODO modify below lines to display your configuration information
-    moduleName  = "test_scripts.tester_" + sys_state["test_script_name"]
+    moduleName  = "test_scripts." + sys_state["test_script_name"]
     print("Start to run test script: {}".format(moduleName))
     print("Test version: %s"%sys_state["version"])
     print("Test Script Name: %s"%sys_state["test_script_name"])

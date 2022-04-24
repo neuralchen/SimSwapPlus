@@ -5,12 +5,18 @@
 # Created Date: Tuesday September 24th 2019
 # Author: Lcx
 # Email: chenxuanhongzju@outlook.com
-# Last Modified:  Friday, 18th February 2022 3:20:14 pm
+# Last Modified:  Thursday, 14th April 2022 12:33:07 pm
 # Modified By: Chen Xuanhong
 # Copyright (c) 2019 Shanghai Jiao Tong University
 #############################################################
 
-import paramiko,os
+try:
+    import paramiko
+except:
+    from pip._internal import main
+    main(['install', 'paramiko'])
+    import paramiko
+import os
 from pathlib import Path
 # ssh传输类：
 
