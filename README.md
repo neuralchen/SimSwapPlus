@@ -15,21 +15,21 @@ consists of two parts:
 - (2) a synthetic image sub-collection, containing $8, 630$ cleaned and re-annotated identities (i.e., clean up the images with mismatching identities and low-quality faces in the cropped [VGGFace2](https://github.com/ox-vgg/vgg_face2)).
 
 ## Download the dataset:
-***Limited by the capacity of the cloud disk, we divided the dataset into two parts***
+<!-- ***Limited by the capacity of the cloud disk, we divided the dataset into two parts*** -->
 
 ### Via Google Drive:
 
-[[Google Drive]  VGGFace2-HQ Part1 (89GB)](https://drive.google.com/drive/folders/1ZHy7jrd6cGb2lUa4qYugXe41G_Ef9Ibw?usp=sharing)
+[[Google Drive]  VGGFace2-HQ (89GB)](https://drive.google.com/drive/folders/1ZHy7jrd6cGb2lUa4qYugXe41G_Ef9Ibw?usp=sharing)
 
-[[Google Drive]  VGGFace2-HQ Part2 (89GB)](https://drive.google.com/drive/folders/1ZHy7jrd6cGb2lUa4qYugXe41G_Ef9Ibw?usp=sharing)
+<!-- [[Google Drive]  VGGFace2-HQ Part2 (89GB)](https://drive.google.com/drive/folders/1ZHy7jrd6cGb2lUa4qYugXe41G_Ef9Ibw?usp=sharing) -->
 
 ***We are especially grateful to [Kairui Feng](https://scholar.google.com.hk/citations?user=4N5hE8YAAAAJ&hl=zh-CN) PhD student from Princeton University.***
 
 ### Via Baidu Drive:
 
-[[Baidu Drive] VGGFace2-HQ Part1 (89GB)](https://pan.baidu.com/s/1LwPFhgbdBj5AeoPTXgoqDw) Password: ```sjtu```
+[[Baidu Drive] VGGFace2-HQ (89GB)](https://pan.baidu.com/s/1LwPFhgbdBj5AeoPTXgoqDw) Password: ```sjtu```
 
-[[Baidu Drive] VGGFace2-HQ Part2 (89GB)](https://pan.baidu.com/s/1LwPFhgbdBj5AeoPTXgoqDw) Password: ```sjtu```
+<!-- [[Baidu Drive] VGGFace2-HQ Part2 (89GB)](https://pan.baidu.com/s/1LwPFhgbdBj5AeoPTXgoqDw) Password: ```sjtu``` -->
 
 ## Samples from VGGFace2-HQ
 
