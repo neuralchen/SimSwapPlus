@@ -37,6 +37,10 @@ consists of two parts:
 
 [![naturalpart.png](/docs/img/naturalpart.png)](https://github.com/neuralchen/SimSwapPlusPlus)
 
+### Synthetic Part:
+
+[![naturalpart.png](/docs/img/naturalpart.png)](https://github.com/neuralchen/SimSwapPlusPlus)
+
 # Methodology of SimSwap++
 ## Additional Results:
 
