@@ -33,6 +33,10 @@ consists of two parts:
 
 ## Samples from VGGFace2-HQ
 
+### Natural Part:
+
+[![naturalpart.png](/docs/img/naturalpart.png)](https://github.com/neuralchen/SimSwapPlusPlus)
+
 # Methodology of SimSwap++
 ## Additional Results:
 
