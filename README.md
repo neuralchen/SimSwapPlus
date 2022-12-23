@@ -39,16 +39,18 @@ consists of two parts:
 
 ### Synthetic Part:
 
-[![naturalpart.png](/docs/img/naturalpart.png)](https://github.com/neuralchen/SimSwapPlusPlus)
+[![naturalpart.png](/docs/img/syntheticpart.png)](https://github.com/neuralchen/SimSwapPlusPlus)
 
 # Methodology of SimSwap++
 ## Additional Results:
+
+Will be avaliable 2022/12/25
 
 
 ## Video Results:
 
 
-
+Will be avaliable 2022/12/25
 
 # Acknowledgements
 
