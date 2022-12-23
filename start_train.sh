@@ -1,1 +1,0 @@
-nohup python train_multigpu.py > 2maskloss2_1.log 2>&1 &
