@@ -19,7 +19,7 @@ consists of two parts:
 
 ### Via Google Drive:
 
-[[Google Drive]  VGGFace2-HQ (89GB)](https://drive.google.com/drive/folders/1ZHy7jrd6cGb2lUa4qYugXe41G_Ef9Ibw?usp=sharing)
+[[Google Drive]  VGGFace2-HQ](https://drive.google.com/drive/folders/1ZHy7jrd6cGb2lUa4qYugXe41G_Ef9Ibw?usp=sharing)
 
 <!-- [[Google Drive]  VGGFace2-HQ Part2 (89GB)](https://drive.google.com/drive/folders/1ZHy7jrd6cGb2lUa4qYugXe41G_Ef9Ibw?usp=sharing) -->
 
@@ -27,7 +27,7 @@ consists of two parts:
 
 ### Via Baidu Drive:
 
-[[Baidu Drive] VGGFace2-HQ (89GB)](https://pan.baidu.com/s/1LwPFhgbdBj5AeoPTXgoqDw) Password: ```sjtu```
+[[Baidu Drive] VGGFace2-HQ](https://pan.baidu.com/s/1LwPFhgbdBj5AeoPTXgoqDw) Password: ```sjtu```
 
 <!-- [[Baidu Drive] VGGFace2-HQ Part2 (89GB)](https://pan.baidu.com/s/1LwPFhgbdBj5AeoPTXgoqDw) Password: ```sjtu``` -->
 
