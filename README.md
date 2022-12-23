@@ -5,7 +5,7 @@ $\dagger$ Corresponding author
 ## Project page of SimSwap++
 
 
-[![logo](/docs/img/logo.png)](https://github.com/neuralchen/SimSwapPlusPlus)
+[![logo](/docs/img/logo.png)](https://github.com/neuralchen/SimSwapPlus)
 
 # VGGFace2-HQ Dataset
 VGGFace2-HQ contains more than $1.36M$ $512 \times 512$ aligned
@@ -35,11 +35,11 @@ consists of two parts:
 
 ### Natural Part:
 
-[![naturalpart.png](/docs/img/naturalpart.png)](https://github.com/neuralchen/SimSwapPlusPlus)
+[![naturalpart.png](/docs/img/naturalpart.png)](https://github.com/neuralchen/SimSwapPlus)
 
 ### Synthetic Part:
 
-[![naturalpart.png](/docs/img/syntheticpart.png)](https://github.com/neuralchen/SimSwapPlusPlus)
+[![naturalpart.png](/docs/img/syntheticpart.png)](https://github.com/neuralchen/SimSwapPlus)
 
 # Methodology of SimSwap++
 ## Additional Results:
