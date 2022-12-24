@@ -58,9 +58,9 @@ Will be avaliable 2022/12/25
 
 <img src="./docs/video/2.webp"/>
 
-[Source ID: Gal Gadot Target ID: Taylor Swift (1080p on YouTube)](https://www.youtube.com/watch?v=0EI6IEiibqo)
+[Source ID: Gal Gadot Target ID: Taylor Swift (1080p on YouTube)](https://youtu.be/I00NuaICEQE)
 
-<img src="./docs/video/3.webp"/>
+[![Gal Gadot](/docs/video/3.webp)](https://youtu.be/I00NuaICEQE)
 
 [Source ID: Leonardo DiCaprio Target ID: Taylor Swift (1080p on YouTube)](https://www.youtube.com/watch?v=75W6j-0ux4k)
 
