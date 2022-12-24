@@ -54,9 +54,9 @@ Will be avaliable 2022/12/25
 
 <img src="./docs/video/1.webp"/>
 
-[Source ID: Geoffrey Hinton Target ID: Taylor Swift (1080p on YouTube)](https://www.youtube.com/watch?v=j8w8rR--UTA)
+[Source ID: Geoffrey Hinton Target ID: Taylor Swift (1080p on YouTube)](https://youtu.be/QLrneMYKki0)
 
-<img src="./docs/video/2.webp"/>
+[![Geoffrey Hinton](/docs/video/2.webp)](https://youtu.be/QLrneMYKki0)
 
 [Source ID: Gal Gadot Target ID: Taylor Swift (1080p on YouTube)](https://youtu.be/I00NuaICEQE)
 
