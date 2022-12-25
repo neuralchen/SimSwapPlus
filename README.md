@@ -50,6 +50,12 @@ Will be avaliable 2022/12/25
 ## Video in-the-wild Results (under construction):
 
 ### Group1 [SimSwap++ (S)]:
+
+[Source ID: Dilireba Target ID: Shakira (1080p on Google Drive)](https://drive.google.com/file/d/1UDj9yw_uhAyxbASijOQhKQfKXiS2KFEv/view?usp=sharing)
+
+[![Dilireba](/docs/video/wakawaka_dlrb.webp)](https://drive.google.com/file/d/1UDj9yw_uhAyxbASijOQhKQfKXiS2KFEv/view?usp=sharing)
+
+### Group2 [SimSwap++ (S)]:
 [Source ID: Kelly Clarkson Target ID: Taylor Swift (1080p on YouTube)](https://www.youtube.com/watch?v=U9WFnMHs6Nw)
 
 <img src="./docs/video/1.webp"/>
