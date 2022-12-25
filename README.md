@@ -4,6 +4,10 @@ $\dagger$ Corresponding author
 
 ## Project page of SimSwap++
 
+## <img width=8% src="./docs/img/attention.gif"/>
+
+## ***Please note that the current respository is a supplementary material for the SimSwap++ paper, NO issues will be replied at this stage***
+
 
 [![logo](/docs/img/logo.png)](https://github.com/neuralchen/SimSwapPlus)
 
