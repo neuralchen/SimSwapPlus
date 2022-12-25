@@ -75,6 +75,13 @@ Musk's face is always so recognizable!
 
 [![Keira Knightley](/docs/video/id_KeiraKnightley--attr_ShakiraWakaWaka.webp)](https://drive.google.com/file/d/1uJWmQ9Hv3c3XM26fCGmZhjdEfnUujiAJ/view?usp=sharing)
 
+[Source ID: Brad Pitt Target ID: Shakira (1080p on Google Drive)](https://drive.google.com/file/d/1vXe0awnEmuDVj8m3akfDSyYzGB0VyXoo/view?usp=sharing)
+
+[![Brad Pitt](/docs/video/id_bradpitt1--attr_ShakiraWakaWaka.webp)](https://drive.google.com/file/d/1vXe0awnEmuDVj8m3akfDSyYzGB0VyXoo/view?usp=sharing)
+
+
+
+
 ### Group2 [SimSwap++ (S)]:
 [Source ID: Kelly Clarkson Target ID: Taylor Swift (1080p on YouTube)](https://www.youtube.com/watch?v=U9WFnMHs6Nw)
 
