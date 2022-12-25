@@ -4,7 +4,8 @@ $\dagger$ Corresponding author
 
 ## Project page of SimSwap++
 
-## <img width=15% src="./docs/img/attention.gif"/> ***Please note that the current respository is a supplementary material for the SimSwap++ paper, NO issues will be replied at this stage***
+## <img width=15% src="./docs/img/attention.gif"/> 
+## ***Please note that the current respository is a supplementary material for the SimSwap++ paper, NO issues will be replied at this stage. Once everything is ready we will release training and testing codes like our [SimSwap](https://github.com/neuralchen/SimSwap).***
 
 
 [![logo](/docs/img/logo.png)](https://github.com/neuralchen/SimSwapPlus)
