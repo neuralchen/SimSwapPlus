@@ -50,6 +50,7 @@ Will be avaliable 2022/12/25
 
 
 ## Video in-the-wild Results (under construction):
+### Videos are generated frame by frame without any temporal smoothing (e.g., Kalman Filter), which may cause some subtle flickering.
 
 ### Group1 [SimSwap++ (S)]:
 
