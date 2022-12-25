@@ -49,7 +49,7 @@ Will be avaliable 2022/12/25
 
 ## Video in-the-wild Results (under construction):
 
-### Group1:
+### Group1 [SimSwap++ (S)]:
 [Source ID: Kelly Clarkson Target ID: Taylor Swift (1080p on YouTube)](https://www.youtube.com/watch?v=U9WFnMHs6Nw)
 
 <img src="./docs/video/1.webp"/>
