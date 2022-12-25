@@ -4,9 +4,7 @@ $\dagger$ Corresponding author
 
 ## Project page of SimSwap++
 
-## <img width=8% src="./docs/img/attention.gif"/>
-
-## ***Please note that the current respository is a supplementary material for the SimSwap++ paper, NO issues will be replied at this stage***
+## <img width=15% src="./docs/img/attention.gif"/> ***Please note that the current respository is a supplementary material for the SimSwap++ paper, NO issues will be replied at this stage***
 
 
 [![logo](/docs/img/logo.png)](https://github.com/neuralchen/SimSwapPlus)
@@ -58,6 +56,10 @@ Will be avaliable 2022/12/25
 [Source ID: Dilireba Target ID: Shakira (1080p on Google Drive)](https://drive.google.com/file/d/1UDj9yw_uhAyxbASijOQhKQfKXiS2KFEv/view?usp=sharing)
 
 [![Dilireba](/docs/video/wakawaka_dlrb.webp)](https://drive.google.com/file/d/1UDj9yw_uhAyxbASijOQhKQfKXiS2KFEv/view?usp=sharing)
+
+[Source ID: Tom Cruise Target ID: Shakira (1080p on Google Drive)](https://drive.google.com/file/d/1N87we7Tf-gz5X0YJqOB6YVJNf84Yg9vk/view?usp=sharing)
+
+[![Tom Cruise](/docs/video/id_2130429-1216_tom_cruise_genes--attr_ShakiraWakaWaka.webp)](https://drive.google.com/file/d/1N87we7Tf-gz5X0YJqOB6YVJNf84Yg9vk/view?usp=sharing)
 
 ### Group2 [SimSwap++ (S)]:
 [Source ID: Kelly Clarkson Target ID: Taylor Swift (1080p on YouTube)](https://www.youtube.com/watch?v=U9WFnMHs6Nw)
