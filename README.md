@@ -61,6 +61,10 @@ Will be avaliable 2022/12/25
 
 [![Tom Cruise](/docs/video/id_2130429-1216_tom_cruise_genes--attr_ShakiraWakaWaka.webp)](https://drive.google.com/file/d/1N87we7Tf-gz5X0YJqOB6YVJNf84Yg9vk/view?usp=sharing)
 
+[Source ID: Elon Musk Target ID: Shakira (1080p on Google Drive)](https://drive.google.com/file/d/1zutwS3pPKKnt-WwsolPNC1HQyBzgmMU7/view?usp=sharing)
+
+[![Elon Musk](/docs/video/id_elon-musk-hero-image--attr_ShakiraWakaWaka.webp)](https://drive.google.com/file/d/1zutwS3pPKKnt-WwsolPNC1HQyBzgmMU7/view?usp=sharing)
+
 ### Group2 [SimSwap++ (S)]:
 [Source ID: Kelly Clarkson Target ID: Taylor Swift (1080p on YouTube)](https://www.youtube.com/watch?v=U9WFnMHs6Nw)
 
