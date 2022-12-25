@@ -79,6 +79,9 @@ Musk's face is always so recognizable!
 
 [![Brad Pitt](/docs/video/id_bradpitt1--attr_ShakiraWakaWaka.webp)](https://drive.google.com/file/d/1vXe0awnEmuDVj8m3akfDSyYzGB0VyXoo/view?usp=sharing)
 
+[Source ID: Nicole Kidman Target ID: Shakira (1080p on Google Drive)](https://drive.google.com/file/d/1jUESffXxB7K-3siG5GK4STGxAs2hTiJ3/view?usp=sharing)
+
+[![Nicole Kidman](/docs/video/id_nicole-kidman--attr_ShakiraWakaWaka.webp)](https://drive.google.com/file/d/1jUESffXxB7K-3siG5GK4STGxAs2hTiJ3/view?usp=sharing)
 
 
 
