@@ -117,8 +117,11 @@ Musk's face is always so recognizable!
 
 [![Aamir Khan](/docs/video/7.webp)](https://youtu.be/BY-sMBTbtBU)
 
-### Group3 [SimSwap++ (S)]:
+### Group3 [SimSwap++ (S)] Complex Movie Scene:
+
 ### I am Iron Man
+***Few previous face-swapping papers have published such complex movie scenes***
+***The subtle flickering can be resolved by introducing temporal smoothing, which is not our concern***
 
 [Source ID: Elon Musk Target ID: Iron Man (1080p on Google Drive)](https://drive.google.com/file/d/1AYWRzUppslvvzzFvBL4JiCvpum_ZCeUL/view?usp=sharing)
 
