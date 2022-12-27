@@ -82,6 +82,18 @@ consists of two parts:
 
 <img src="./docs/samples/id_Jackie-Chan-1200by667--attr_BG_TOYART_GAMORA.png"/>
 
+[Source ID: Messi Target ID: Gamora]
+
+<img src="./docs/samples/id_messi2--attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Kylian Mbappé Target ID: Gamora]
+
+<img src="./docs/samples/id_mbp--attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Cristiano Ronaldo Target ID: Gamora]
+
+<img src="./docs/samples/id_Cristiano_Ronaldo--attr_BG_TOYART_GAMORA.png"/>
+
 ## Video in-the-wild Results (under construction):
 ### Videos are generated frame by frame without any temporal smoothing (e.g., Kalman Filter), which may cause some subtle flickering.
 
