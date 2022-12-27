@@ -62,6 +62,26 @@ consists of two parts:
 
 <img src="./docs/samples/id_will_smith_attr_BG_TOYART_GAMORA.png"/>
 
+[Source ID: Geoffrey Hinton Target ID: Gamora]
+
+<img src="./docs/samples/id_hinton--attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Captain America Chris Evans Target ID: Gamora]
+
+<img src="./docs/samples/id_ChrisEvans--attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Jim Carrey Target ID: Gamora]
+
+<img src="./docs/samples/id_JimCarrey--attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Matthew McConaughey Target ID: Gamora]
+
+<img src="./docs/samples/id_MatthewMcConaughey1--attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Jackie Chan Target ID: Gamora]
+
+<img src="./docs/samples/id_Jackie-Chan-1200by667--attr_BG_TOYART_GAMORA.png"/>
+
 ## Video in-the-wild Results (under construction):
 ### Videos are generated frame by frame without any temporal smoothing (e.g., Kalman Filter), which may cause some subtle flickering.
 
