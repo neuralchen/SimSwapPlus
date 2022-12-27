@@ -94,6 +94,10 @@ consists of two parts:
 
 <img src="./docs/samples/id_Cristiano_Ronaldo--attr_BG_TOYART_GAMORA.png"/>
 
+[Source ID: Quentin Tarantino Target ID: Gamora]
+
+<img src="./docs/samples/id_Quentin-Tarantino-2020--attr_BG_TOYART_GAMORA.png"/>
+
 ## Video in-the-wild Results (under construction):
 ### Videos are generated frame by frame without any temporal smoothing (e.g., Kalman Filter), which may cause some subtle flickering.
 
