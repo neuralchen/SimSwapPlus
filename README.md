@@ -46,8 +46,21 @@ consists of two parts:
 # Methodology of SimSwap++
 ## Additional Results:
 
-Will be avaliable 2022/12/25
+[Source ID: Angelina Jolie Target ID: Gamora]
 
+<img src="./docs/samples/id_angelina-jolie_attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Tom Cruise Target ID: Gamora]
+
+<img src="./docs/samples/id_tom_cruise_genes--attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Brad Pitt Target ID: Gamora]
+
+<img src="./docs/samples/id_BradPitt--attr_BG_TOYART_GAMORA.png"/>
+
+[Source ID: Will Smith Target ID: Gamora]
+
+<img src="./docs/samples/id_will_smith_attr_BG_TOYART_GAMORA.png"/>
 
 ## Video in-the-wild Results (under construction):
 ### Videos are generated frame by frame without any temporal smoothing (e.g., Kalman Filter), which may cause some subtle flickering.
