@@ -1,5 +1,5 @@
 # SimSwap++: Towards Faster and High-Quality Identity Swapping
-## Accepted by TPAMI (i.e., IEEE Transactions on Pattern Analysis and Machine Intelligence)
+## Accepted by TPAMI (IEEE Transactions on Pattern Analysis and Machine Intelligence)
 ### [Xuanhong Chen](https://scholar.google.com/citations?user=UuCqlfEAAAAJ&hl=en), [Bingbing Ni](https://scholar.google.com/citations?user=V9W87PYAAAAJ&hl=en) $\dagger$, Yutian Liu, Naiyuan Liu, Linzhi Zeng, Hang Wang
 $\dagger$ Corresponding author
 
